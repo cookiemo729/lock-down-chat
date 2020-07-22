@@ -98,5 +98,5 @@ io.on('connection', () =>{
 // })
 
 var server = http.listen(PORT, () => {
-  console.log('server is running on port', server.address().port);
+  console.log('server is running');
 });
