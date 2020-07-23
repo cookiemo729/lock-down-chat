@@ -41,6 +41,15 @@ app.use(function(req, res, next) {
 
 // Routes
 // app.use('/', require('./routes/index.js'));
+app.use(ignoreFavicon); //Important***
+
+function ignoreFavicon(req, res, next) { //Important***
+  if (req.originalUrl === '/favicon.ico') {
+    res.status(204).json({nope: true});
+  } else {
+    next();
+  }
+}
 
 const messageRef = database.ref('/Messages');
 
