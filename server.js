@@ -77,7 +77,9 @@ app.get('/:id', (req, res) => {
             // console.log(child.val())
           });          
           // console.log(snapshot.val());
-          res.render('lockdownchat', { theMessages: messageArray, MessageID: req.params.id });
+          req.flash('success_msg', 'Chat Room ' + req.params.id + ' entered');
+          res.render('lockdownchat', { theMessages: messageArray, MessageID: req.params.id, success_msg: req.flash('success_msg') });
+
         }
         else{
           let errors = [];
@@ -119,6 +121,7 @@ app.get('/:id', (req, res) => {
                 name: '',
                 message: ''
               });
+              req.flash('success_msg', 'Chat Room ' + req.params.id + ' entered');
               res.redirect(`/${req.params.id}`);
             }
             else{
