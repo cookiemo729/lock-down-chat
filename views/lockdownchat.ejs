@@ -13,51 +13,144 @@
     <br>
     <%- include('./partials/messages.ejs'); %>
 
+    <% if(isInstructor == 'false') { %>
     <form method="POST" action="/<%= MessageID %>">
     <div class="jumbotron">
         <h1 class="display-4">Send Message</h1>
         <br>
-        <input id="name" name="name" class="form-control" placeholder="Name">
+        <input id="name" name="name" class="form-control" placeholder="Name" required>
         <br>
-        <textarea id="message" name="message" class="form-control" placeholder="Your Message Here"></textarea>
+        <textarea id="message" name="message" class="form-control" placeholder="Your Message Here" required></textarea>
         <br>
         <button id="send" type="submit" class="btn btn-success">Send</button>
     </div>
-</form>
-    <div id="messages">
-        <% for(var i = 0; i < theMessages.length; i++) { %>
-            <h4><%= theMessages[i].name %></h4>
-            <p><%= theMessages[i].message %></p>
-            
+    </form>
+    <% } else{ %>
+        <form method="GET" action="/<%= MessageID %>/instructor/clear">
+            <button id="clearMessagesID" type="button" data-toggle="modal" data-target="#exampleModal" class="btn btn-danger" style="font-weight: bold; float: right;">Clear All Messages</button>
+            <button id="clearMessagesBtnID" type="submit" data-toggle="modal" data-target="#exampleModal" class="btn btn-danger" style="font-weight: bold; float: right;" hidden>Clear All Messages</button>
+        </form>
+        <!-- <a href="/<%= MessageID %>/instructor/clear" id="clearMessagesLinkID" class="btn btn-danger" style="font-weight: bold; float: right;" hidden>Clear Messages</a> -->
+<br/>
+<br/>
+<br/>
+        <form method="POST" action="/<%= MessageID %>/instructor">
+            <div class="jumbotron">
+                <h1 class="display-4">Instructor</h1>
+                <h1 class="display-4">Send Message</h1>
+                <br>
+                <input id="name" name="name" class="form-control" placeholder="Name" required>
+                <br>
+                <textarea id="message" name="message" class="form-control" placeholder="Your Message Here" required></textarea>
+                <br>
+                <button id="send" type="submit" class="btn btn-success">Send</button>
+            </div>
+            </form>
+
+    <% } %>
+
+    <% if(isInstructor == 'false') { %>
+    <div id="messagesStudent">
+        <% for(var i = 0; i < theMessages.length - 2; i++) { %>
+            <!-- if(message is not hidden){ display the bottom } no else -->
+                <% if(theMessages[i].state == 'visible') { %>
+                <div id="<%= theMessagesIDs[i] %>" style="background-color: <%= theMessages[i].backgroundTextColor %>;">
+                <h4 style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].name %></h4>
+                <p style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].message %></p>
+                </div>
+                <% } else { %>
+                    <div id="<%= theMessagesIDs[i] %>" style="background-color: <%= theMessages[i].backgroundTextColor %>;" hidden>
+                        <h4 style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].name %></h4>
+                        <p style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].message %></p>
+                    </div>
+                <% } %>
         <% } %>
+
     </div>
+    <% } else{ %>
+        <div id="messagesInstructor">
+            <% for(var i = 0; i < theMessages.length - 2; i++) { %>
+                <div style="background-color: <%= theMessages[i].backgroundTextColor %>;">
+                    <!-- if msg is hidden, button text is 'unhide' else it is hide -->
+                    <!-- hide post to /:id/instructor/hide -->
+                    <% if(theMessages[i].state == 'visible') { %>
+                    <a href="/<%= MessageID %>/instructor/<%= theMessagesIDs[i] %>/hide" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Hide</a>
+                    <% } else { %>
+                    <a href="/<%= MessageID %>/instructor/<%= theMessagesIDs[i] %>/unhide" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Unhide</a>
+                    <% } %>
+                        <!-- unhide post to /:id/instructor/unhide -->
+                    <h4 style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].name %></h4>
+                <p style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].message %></p>
+                </div>
+            <% } %>
+        </div>
+    <% } %>
+
 </div>
+
+<!-- Modal -->
+<div id="ModalPopUpForDeletion">
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel"></h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="modal-bodyID">
+              Are you sure to clear all messages in this chat room?
+          </div>
+          <div class="modal-footer" id="modalfooter" name="modalfooter">
+            <button type="button" class="btn btn-secondary" style="font-weight: bold;" data-dismiss="modal">Close</button>
+            <button type="button" name="ConfirmDeleteBtnInModal" id="ConfirmDeleteBtnInModal" class="btn btn-danger" style="font-weight: bold;">Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 <script>
    var socket = io();
     $(() => {
-        // $("#send").click(()=>{
-        //     sendMessage({name: $("#name").val(), message: $("#message").val()});
-        // })
 
-        // getMessages()
     })
 
     socket.on('message', addMessages)
+    socket.on('messageHide', hideMessages)
+    socket.on('messageUnhide', UnhideMessages)
+    socket.on('messageClear', ClearMessages)
 
     function addMessages(message){
-        $("#messages").append(`<h4> ${message.name} </h4> <p> ${message.message} </p>`)
+        $("#messagesStudent").append(`<div id="${message.theMsgID}" style="background-color: ${message.backgroundTextColor};"> 
+            <h4 style="color: ${message.textColor};"> ${message.name} </h4>
+            <p style="color: ${message.textColor};"> ${message.message} </p>
+            </div>`)
+
+        $("#messagesInstructor").append(`<div style="background-color: ${message.backgroundTextColor};">
+                    <a href="/<%= MessageID %>/instructor/${message.theMsgID}/hide" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Hide</a>
+                    <h4 style="color: ${message.textColor};">${message.name}</h4>
+                <p style="color: ${message.textColor};">${message.message}</p>
+                </div>`)
+    }
+    function hideMessages(hiddenMsgID){
+        $("#" + hiddenMsgID.theMsgID).hide();
+    }
+    function UnhideMessages(hiddenMsgID){
+        $("#" + hiddenMsgID.theMsgID).show();
+    }
+    function ClearMessages(){
+        $("#messagesStudent").html('');
     }
 
-    // function getMessages(){
-    //     // alert('jnsjaknc')
-    // //   $.get('/messages', (data) => {
-    // //     data.forEach(addMessages);
-    // //   })
-    // }
+    $("#clearMessagesID").click(function(){
+        $('#exampleModal').modal('show')
+    });
 
-    // function sendMessage(message){
-    // //   $.post('/messages', message)
-    // }
+    $('#ModalPopUpForDeletion').on('click', 'button[name$="ConfirmDeleteBtnInModal"]', function () {
+        $('#exampleModal').modal('hide');
+        $("#clearMessagesBtnID").click()
+    });
 </script>
 </body>
 </html>

@@ -1,0 +1,51 @@
+<div class="row mt-5">
+    <div class="col-md-6 m-auto">
+        <div class="card card-body text-center">
+            <h1><i class="fas fa-ban fa-4x"></i></h1>
+            <%- include('./partials/messages.ejs'); %>
+
+            <h4>Lock Down Chat</h4>
+            <br/>
+            <form method="POST" action="/admin/infinity">
+                <button id="clearChatsID" type="button" data-toggle="modal" data-target="#exampleModal" class="btn btn-danger" style="font-weight: bold;">Clear All Chats</button>
+                <button id="clearChatsBtnID" type="submit" data-toggle="modal" data-target="#exampleModal" class="btn btn-danger" style="font-weight: bold;" hidden>Clear All Chats</button>
+            </form>
+            </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="ModalPopUpForDeletion">
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel"></h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="modal-bodyID">
+              Are you sure to clear all messages in this chat room?
+          </div>
+          <div class="modal-footer" id="modalfooter" name="modalfooter">
+            <button type="button" class="btn btn-secondary" style="font-weight: bold;" data-dismiss="modal">Close</button>
+            <button type="button" name="ConfirmDeleteBtnInModal" id="ConfirmDeleteBtnInModal" class="btn btn-danger" style="font-weight: bold;">Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
+
+  
+  <script>
+      $("#clearChatsID").click(function(){
+        $('#exampleModal').modal('show')
+    });
+
+    $('#ModalPopUpForDeletion').on('click', 'button[name$="ConfirmDeleteBtnInModal"]', function () {
+        $('#exampleModal').modal('hide')
+        $('#clearChatsBtnID').click();
+    });
+  </script>

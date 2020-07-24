@@ -68,17 +68,16 @@ app.get('/createChat', (req, res) => {
 
 app.get('/:id', (req, res) => {
       var messageArray = [];
+      var messageIDArray = [];
 
       messageRef.child(req.params.id).once("value", function(snapshot) {
         if(snapshot.exists()){
-          // console.log("Exist")
           snapshot.forEach((child) => {
+            messageIDArray.push(child.key);
             messageArray.push(child.val());
-            // console.log(child.val())
           });          
-          // console.log(snapshot.val());
           req.flash('success_msg', 'Chat Room ' + req.params.id + ' entered');
-          res.render('lockdownchat', { theMessages: messageArray, MessageID: req.params.id, success_msg: req.flash('success_msg') });
+          res.render('lockdownchat', { theMessages: messageArray, theMessagesIDs: messageIDArray, MessageID: req.params.id, success_msg: req.flash('success_msg'), isInstructor: 'false' });
 
         }
         else{
@@ -138,22 +137,44 @@ app.get('/:id', (req, res) => {
 
 app.post('/:id', async (req, res) => {
   try{
-    // const message_id = messageRef.push().key;
         messageRef.child(req.params.id).push({
             name: req.body.name,
-            message: req.body.message
+            message: req.body.message,
+            textColor: '#000000',
+            backgroundTextColor: '#99ffbb',
+            owner: 'Student',
+            state: 'visible'
         });
-        
-        io.emit('message', req.body);
-        // console.log(req.body)
-        const messageArray = [];
+        req.body.textColor = '#000000';
+        req.body.backgroundTextColor = '#99ffbb';
+        req.body.owner = 'Instructor';
+        req.body.state = 'visible';
+
+        var dataArray = [];
+        messageRef.child(req.params.id).once("value", function(snapshot) {
+          snapshot.forEach((child) => {
+            dataArray.push(child.key);
+         });          
+
+         req.body.theMsgID = dataArray.slice(-3)[0];
+        //  console.log(req.body.theMsgID);
+         io.emit('message', req.body);
+
+        }, function (errorObject) {
+          console.log("The read failed: " + errorObject.code);
+        });
+
+       
+        var messageArray = [];
+        var messageIDArray = [];
 
           messageRef.child(req.params.id).once("value", function(snapshot) {
               snapshot.forEach((child) => {
+                  messageIDArray.push(child.key);
                   messageArray.push(child.val());
                 });          
                 // console.log(messageArray);
-              res.render('lockdownchat', { theMessages: messageArray, MessageID: req.params.id });
+              res.render('lockdownchat', { theMessages: messageArray, theMessagesIDs: messageIDArray, MessageID: req.params.id, isInstructor: 'false' });
       
             }, function (errorObject) {
               console.log("The read failed: " + errorObject.code);
@@ -168,51 +189,216 @@ app.post('/:id', async (req, res) => {
         }
 })
 
-// app.get('/messages', (req, res) => {
-//   let messageArray = [];
-//     messageRef.once("value", function(snapshot) {
-//         snapshot.forEach((child) => {
-//             messageArray.push(child.val());
-//           });
-//         console.log(messageArray);
-//         res.send(messageArray);
-//       }, function (errorObject) {
-//         console.log("The read failed: " + errorObject.code);
-//       });
-// })
+app.get('/:id/instructor', (req, res) => {
+    var messageArray = [];
+    var messageIDArray = [];
+
+    messageRef.child(req.params.id).once("value", function(snapshot) {
+      if(snapshot.exists()){
+        snapshot.forEach((child) => {
+          messageIDArray.push(child.key);
+          messageArray.push(child.val());
+        });          
+        // req.flash('success_msg', 'Chat Room ' + req.params.id + ' entered as instructor');
+        res.render('lockdownchat', { theMessages: messageArray, theMessagesIDs: messageIDArray, MessageID: req.params.id, success_msg: req.flash('success_msg'), isInstructor: 'true' });
+
+      }
+      else{
+        let errors = [];
+        var haveUpperCase = 0;
+        var haveLowerCase = 0;
+        var have16Characters = 0;
+
+          if(req.params.id.length < 16){
+            errors.push({ msg: 'Chat Room ID must be at least 16 characters' });
+          }
+          else{
+            have16Characters = 1;
+          }
+
+          
+          for(i = 0; i < req.params.id.length; i++){
+                if (req.params.id[i] == req.params.id[i].toUpperCase()) {
+                    haveUpperCase = 1;
+                    break;
+                }
+          }
+
+          if(haveUpperCase == 0){
+              errors.push({ msg: 'Chat Room ID must have an Uppercase letter' });
+          }
+
+          for(i = 0; i < req.params.id.length; i++){
+            if (req.params.id[i] == req.params.id[i].toLowerCase()) {
+              haveLowerCase = 1;
+                break;
+            }
+          }
+          if(haveLowerCase == 0){
+            errors.push({ msg: 'Chat Room ID must have an Lowercase letter' });
+          }
+
+          if(haveUpperCase == 1 && haveLowerCase == 1 && have16Characters == 1){
+            messageRef.child(req.params.id).set({
+              name: '',
+              message: ''
+            });
+            // req.flash('success_msg', 'Chat Room ' + req.params.id + ' entered as instructor');
+            res.redirect(`/${req.params.id}/instructor`);
+          }
+          else{
+            res.render('homepage', { errors });
+          }
+
+      }
+  }, function (errorObject) {
+    console.log("The read failed: " + errorObject.code);
+  });
+});
 
 
-// app.post('/messages', async (req, res) => {
-//   try{
-//     const message_id = messageRef.push().key;
-//         messageRef.child(message_id).set({
-//             name: req.body.name,
-//             message: req.body.message
-//         });
-        
-//         io.emit('message', req.body);
-//         // console.log(req.body)
-//         const messageArray = [];
 
-//         messageRef.once("value", function(snapshot) {
-//             snapshot.forEach((child) => {
-//                 messageArray.push(child.val());
-//               });          
-//             //   console.log(messageArray);
-//             res.render('lockdownchat', { theMessages: messageArray});
+app.post('/:id/instructor', async (req, res) => {
+  try{
+        messageRef.child(req.params.id).push({
+            name: req.body.name,
+            message: req.body.message,
+            textColor: 'blue',
+            backgroundTextColor: '#ffffb3',
+            owner: 'Instructor',
+            state: 'visible'
+        });
+        req.body.textColor = 'blue';
+        req.body.backgroundTextColor = '#ffffb3';
+        req.body.owner = 'Instructor';
+        req.body.state = 'visible';
+
+        var dataArray = [];
+        messageRef.child(req.params.id).once("value", function(snapshot) {
+          snapshot.forEach((child) => {
+            dataArray.push(child.key);
+         });          
+         
+         req.body.theMsgID = dataArray.slice(-3)[0];
+        //  console.log(req.body.theMsgID);
+         io.emit('message', req.body);
+
+        }, function (errorObject) {
+          console.log("The read failed: " + errorObject.code);
+        });
+
+        var messageArray = [];
+        var messageIDArray = [];
+
+          messageRef.child(req.params.id).once("value", function(snapshot) {
+              snapshot.forEach((child) => {
+                  messageIDArray.push(child.key);
+                  messageArray.push(child.val());
+                });          
+              res.render('lockdownchat', { theMessages: messageArray, theMessagesIDs: messageIDArray, MessageID: req.params.id, isInstructor: 'true' });
+      
+            }, function (errorObject) {
+              console.log("The read failed: " + errorObject.code);
+            });
+          }
+        catch (error){
+          res.sendStatus(500);
+          return console.log('error',error);
+        }
+        finally{
+          console.log('Message Posted')
+        }
+})
+
+app.get('/:id/instructor/:theMsgID/hide', async (req, res) => {
+        messageRef.child(req.params.id).child(req.params.theMsgID).once("value", function(snapshot) {
+          messageRef.child(req.params.id).child(req.params.theMsgID).set({
+                name: snapshot.val().name,
+                message: snapshot.val().message,
+                textColor: 'black',
+                backgroundTextColor: '#b3b3b3',
+                owner: snapshot.val().owner,
+                state: 'hidden'
+            });
+            req.body.theMsgID = req.params.theMsgID;
+            req.body.name = snapshot.val().name;
+            req.body.message = snapshot.val().message;
+            req.body.textColor = 'black';
+            req.body.backgroundTextColor = '#b3b3b3';
+            req.body.owner = snapshot.val().owner;
+            req.body.state = 'hidden';
+
+            res.redirect(`/${req.params.id}/instructor`);
+            io.emit('messageHide', req.body);
+            
+        }, function (errorObject) {
+          console.log("The read failed: " + errorObject.code);
+        });      
+})
+
+app.get('/:id/instructor/:theMsgID/unhide', async (req, res) => {
+  messageRef.child(req.params.id).child(req.params.theMsgID).once("value", function(snapshot) {
+      if(snapshot.val().owner == 'Student'){
+        messageRef.child(req.params.id).child(req.params.theMsgID).set({
+          name: snapshot.val().name,
+          message: snapshot.val().message,
+          textColor: '#000000',
+          backgroundTextColor: '#99ffbb',
+          owner: snapshot.val().owner,
+          state: 'visible'
+      });
+    }
+    else{
+        messageRef.child(req.params.id).child(req.params.theMsgID).set({
+          name: snapshot.val().name,
+          message: snapshot.val().message,
+          textColor: 'blue',
+          backgroundTextColor: '#ffffb3',
+          owner: snapshot.val().owner,
+          state: 'visible'
+      });
+    }
     
-//           }, function (errorObject) {
-//             console.log("The read failed: " + errorObject.code);
-//           });
-//             }
-//         catch (error){
-//           res.sendStatus(500);
-//           return console.log('error',error);
-//         }
-//         finally{
-//           console.log('Message Posted')
-//         }
-// })
+      req.body.theMsgID = req.params.theMsgID;
+      // req.body.name = snapshot.val().name;
+      // req.body.message = snapshot.val().message;
+      // req.body.textColor = '#000000';
+      // req.body.backgroundTextColor = '#99ffbb';
+      // req.body.owner = snapshot.val().owner;
+      // req.body.state = 'visible';
+
+      res.redirect(`/${req.params.id}/instructor`);
+      io.emit('messageUnhide', req.body);
+      
+  }, function (errorObject) {
+    console.log("The read failed: " + errorObject.code);
+  });      
+})
+
+
+app.get('/:id/instructor/clear', async (req, res) => {
+  let messagesToClear = messageRef.child(req.params.id);
+  messagesToClear.remove()
+  res.redirect(`/${req.params.id}/instructor`);
+  io.emit('messageClear');
+
+})
+
+app.get('/admin/infinity', async (req, res) => {
+  res.render("infinity")
+
+})
+
+app.post('/admin/infinity', async (req, res) => {
+  let messagesToClear = messageRef;
+  messagesToClear.remove();
+  req.flash('success_msg', 'Successfully cleared all chats!');
+  res.redirect(`/admin/infinity`);
+})
+
+
+
+
 
 
 io.on('connection', () =>{
