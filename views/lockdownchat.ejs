@@ -17,8 +17,9 @@
     <form method="POST" action="/<%= MessageID %>">
     <div class="jumbotron">
         <h1 class="display-4">Send Message</h1>
+        <h6>Only post questions about the eSA in this chat room. If you breach any of the assessment regulations or instructions by posting the answers in the chat room, you are liable to disciplinary action.</h6>
         <br>
-        <input id="name" name="name" class="form-control" placeholder="Name" required>
+        <input id="name" name="name" class="form-control" placeholder="Name (Module Group)" required>
         <br>
         <textarea id="message" name="message" class="form-control" placeholder="Your Message Here" required></textarea>
         <br>
@@ -38,8 +39,9 @@
             <div class="jumbotron">
                 <h1 class="display-4">Instructor</h1>
                 <h1 class="display-4">Send Message</h1>
+                <h6>Only post questions about the eSA in this chat room. If you breach any of the assessment regulations or instructions by posting the answers in the chat room, you are liable to disciplinary action.</h6>
                 <br>
-                <input id="name" name="name" class="form-control" placeholder="Name" required>
+                <input id="name" name="name" class="form-control" placeholder="Name (Module Group)" required>
                 <br>
                 <textarea id="message" name="message" class="form-control" placeholder="Your Message Here" required></textarea>
                 <br>
@@ -50,7 +52,7 @@
     <% } %>
 
     <% if(isInstructor == 'false') { %>
-    <div id="messagesStudent">
+    <div id="messagesStudent<%= MessageID %>">
         <% for(var i = 0; i < theMessages.length - 2; i++) { %>
             <!-- if(message is not hidden){ display the bottom } no else -->
                 <% if(theMessages[i].state == 'visible') { %>
@@ -68,7 +70,7 @@
 
     </div>
     <% } else{ %>
-        <div id="messagesInstructor">
+        <div id="messagesInstructor<%= MessageID %>">
             <% for(var i = 0; i < theMessages.length - 2; i++) { %>
                 <div style="background-color: <%= theMessages[i].backgroundTextColor %>;">
                     <!-- if msg is hidden, button text is 'unhide' else it is hide -->
@@ -122,12 +124,12 @@
     socket.on('messageClear', ClearMessages)
 
     function addMessages(message){
-        $("#messagesStudent").append(`<div id="${message.theMsgID}" style="background-color: ${message.backgroundTextColor};"> 
+        $("#messagesStudent" + message.chatID).append(`<div id="${message.theMsgID}" style="background-color: ${message.backgroundTextColor};"> 
             <h4 style="color: ${message.textColor};"> ${message.name} </h4>
             <p style="color: ${message.textColor};"> ${message.message} </p>
             </div>`)
 
-        $("#messagesInstructor").append(`<div style="background-color: ${message.backgroundTextColor};">
+        $("#messagesInstructor" + message.chatID).append(`<div style="background-color: ${message.backgroundTextColor};">
                     <a href="/<%= MessageID %>/instructor/${message.theMsgID}/hide" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Hide</a>
                     <h4 style="color: ${message.textColor};">${message.name}</h4>
                 <p style="color: ${message.textColor};">${message.message}</p>
@@ -139,8 +141,8 @@
     function UnhideMessages(hiddenMsgID){
         $("#" + hiddenMsgID.theMsgID).show();
     }
-    function ClearMessages(){
-        $("#messagesStudent").html('');
+    function ClearMessages(theChatID){
+        $("#messagesStudent" + theChatID).html('');
     }
 
     $("#clearMessagesID").click(function(){

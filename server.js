@@ -149,6 +149,7 @@ app.post('/:id', async (req, res) => {
         req.body.backgroundTextColor = '#99ffbb';
         req.body.owner = 'Instructor';
         req.body.state = 'visible';
+        req.body.chatID = req.params.id;
 
         var dataArray = [];
         messageRef.child(req.params.id).once("value", function(snapshot) {
@@ -280,6 +281,8 @@ app.post('/:id/instructor', async (req, res) => {
          });          
          
          req.body.theMsgID = dataArray.slice(-3)[0];
+         req.body.chatID = req.params.id;
+
         //  console.log(req.body.theMsgID);
          io.emit('message', req.body);
 
@@ -380,7 +383,7 @@ app.get('/:id/instructor/clear', async (req, res) => {
   let messagesToClear = messageRef.child(req.params.id);
   messagesToClear.remove()
   res.redirect(`/${req.params.id}/instructor`);
-  io.emit('messageClear');
+  io.emit('messageClear', req.params.id);
 
 })
 
