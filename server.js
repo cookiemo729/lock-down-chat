@@ -149,14 +149,14 @@ app.post('/:id', async (req, res) => {
             backgroundTextColor: '#99ffbb',
             owner: 'Student',
             state: 'visible',
-            dateTime: d.toLocaleString('en-US', options)
+            dateTime: d.toLocaleString('en-GB', options)
         });
         req.body.textColor = '#000000';
         req.body.backgroundTextColor = '#99ffbb';
         req.body.owner = 'Instructor';
         req.body.state = 'visible';
         req.body.chatID = req.params.id;
-        req.body.dateTime = d.toLocaleString('en-US', options)
+        req.body.dateTime = d.toLocaleString('en-GB', options)
 
         var dataArray = [];
         messageRef.child(req.params.id).once("value", function(snapshot) {
