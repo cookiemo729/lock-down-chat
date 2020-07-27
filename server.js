@@ -140,22 +140,23 @@ app.get('/:id', (req, res) => {
 app.post('/:id', async (req, res) => {
   try{
     var d = new Date();
+    var options = { hour12: false };
 
-        messageRef.child(req.params.id).push({
+    messageRef.child(req.params.id).push({
             name: req.body.name,
             message: req.body.message,
             textColor: '#000000',
             backgroundTextColor: '#99ffbb',
             owner: 'Student',
             state: 'visible',
-            dateTime: d.toLocaleString()
+            dateTime: d.toLocaleString('en-US', options)
         });
         req.body.textColor = '#000000';
         req.body.backgroundTextColor = '#99ffbb';
         req.body.owner = 'Instructor';
         req.body.state = 'visible';
         req.body.chatID = req.params.id;
-        req.body.dateTime = d.toLocaleString()
+        req.body.dateTime = d.toLocaleString('en-US', options)
 
         var dataArray = [];
         messageRef.child(req.params.id).once("value", function(snapshot) {
@@ -268,21 +269,22 @@ app.get('/:id/instructor', (req, res) => {
 app.post('/:id/instructor', async (req, res) => {
   try{
     var d = new Date();
+    var options = { hour12: false };
 
-        messageRef.child(req.params.id).push({
+    messageRef.child(req.params.id).push({
             name: req.body.name,
             message: req.body.message,
             textColor: 'blue',
             backgroundTextColor: '#ffffb3',
             owner: 'Instructor',
             state: 'visible',
-            dateTime: d.toLocaleString()
+            dateTime: d.toLocaleString('en-US', options)
           });
         req.body.textColor = 'blue';
         req.body.backgroundTextColor = '#ffffb3';
         req.body.owner = 'Instructor';
         req.body.state = 'visible';
-        req.body.dateTime = d.toLocaleString()
+        req.body.dateTime = d.toLocaleString('en-US', options)
 
         var dataArray = [];
         messageRef.child(req.params.id).once("value", function(snapshot) {

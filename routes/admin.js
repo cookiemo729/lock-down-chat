@@ -5,34 +5,34 @@ const messageRef = database.ref('/Messages');
 
 
 router.get('/admin/infinity', async (req, res) => {
-    //Get all Chat Rooms
-    var ChatRmIDArray = [];
-    var DateTimeOfLastMsgInEachChatRmArray = [];
+  //Get all Chat Rooms
+  var ChatRmIDArray = [];
+  var DateTimeOfLastMsgInEachChatRmArray = [];
 
-    var ChatRmIDWithoutDateTime = [];
-    var WithoutDateTimeOfLastMsgInEachChatRmArray = [];
-    
+  var ChatRmIDWithoutDateTime = [];
+  var WithoutDateTimeOfLastMsgInEachChatRmArray = [];
+  
 
-    messageRef.on("value", function(snapshot) {
-        snapshot.forEach((child) => {
-            // ChatRmIDArray.push(child.key)
-            var AllDateTimeOfCurrentChatRm = [];
-            child.forEach((childchild) => {
-                AllDateTimeOfCurrentChatRm.push(childchild.val().dateTime);
-            });
+  messageRef.on("value", function(snapshot) {
+      snapshot.forEach((child) => {
+          // ChatRmIDArray.push(child.key)
+          var AllDateTimeOfCurrentChatRm = [];
+          child.forEach((childchild) => {
+              AllDateTimeOfCurrentChatRm.push(childchild.val().dateTime);
+          });
 
 
-            if(AllDateTimeOfCurrentChatRm.length > 2){
-                ChatRmIDArray.push(child.key)
-                DateTimeOfLastMsgInEachChatRmArray.push(AllDateTimeOfCurrentChatRm.slice(-3)[0]);
-            }
-            else{
-                ChatRmIDWithoutDateTime.push(child.key);
-                WithoutDateTimeOfLastMsgInEachChatRmArray.push('-');
-            };
-         });
-         DateTimeOfLastMsgInEachChatRmArray.sort();
-         console.log(DateTimeOfLastMsgInEachChatRmArray)
+          if(AllDateTimeOfCurrentChatRm.length > 2){
+              ChatRmIDArray.push(child.key)
+              DateTimeOfLastMsgInEachChatRmArray.push(AllDateTimeOfCurrentChatRm.slice(-3)[0]);
+          }
+          else{
+              ChatRmIDWithoutDateTime.push(child.key);
+              WithoutDateTimeOfLastMsgInEachChatRmArray.push('-');
+          };
+
+       });
+
           var list = [];
           for (var j = 0; j < ChatRmIDArray.length; j++) 
           list.push({'ChatRmID': ChatRmIDArray[j], 'LastMsgDateTime': DateTimeOfLastMsgInEachChatRmArray[j]});
@@ -44,17 +44,17 @@ router.get('/admin/infinity', async (req, res) => {
             ChatRmIDArray[k] = list[k].ChatRmID;
             DateTimeOfLastMsgInEachChatRmArray[k] = list[k].LastMsgDateTime;
           }
-          
+
           ChatRmIDArray = ChatRmIDArray.concat(ChatRmIDWithoutDateTime);
           DateTimeOfLastMsgInEachChatRmArray = DateTimeOfLastMsgInEachChatRmArray.concat(WithoutDateTimeOfLastMsgInEachChatRmArray);
 
-         res.render('infinity', { ChatRmIDs: ChatRmIDArray, DateTimeOfLastMsgInEachChatRm: DateTimeOfLastMsgInEachChatRmArray})
+          res.render('infinity', { ChatRmIDs: ChatRmIDArray, DateTimeOfLastMsgInEachChatRm: DateTimeOfLastMsgInEachChatRmArray})
 
-      }, function (errorObject) {
-        console.log("The read failed: " + errorObject.code);
-      });
+        }, function (errorObject) {
+          console.log("The read failed: " + errorObject.code);
+        });
 
-    })
+  })
   
   router.post('/admin/infinity', async (req, res) => {
     let chatsToClear = messageRef;
