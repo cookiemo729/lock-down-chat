@@ -1,4 +1,133 @@
-<div class="row mt-5">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
+  <style>
+    .pagetitle{
+      text-align: center;
+    }
+    
+    .clearAll{
+      float: right;
+      font-weight: bold;
+    }
+
+    .DeleteSpecificChat{
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <br/>
+  <br/>
+    <h1 class="pagetitle">Lock Down Chat</h4>
+      <h2 class="pagetitle">Admin View</h2>
+      <br/>
+      <br/>
+
+      <form method="POST" action="/admin/infinity">
+        <button id="clearChatsID" type="button" data-toggle="modal" data-target="#exampleModal" class="btn btn-danger clearAll">Clear All Chats</button>
+        <button id="clearChatsBtnID" type="submit" data-toggle="modal" data-target="#exampleModal" class="btn btn-danger clearAll" hidden>Clear All Chats</button>
+    </form>
+
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <%- include('./partials/messages.ejs'); %>
+    <table class="table table-striped table-responsive">
+      <thead>
+        <tr>
+          <th scope="col">Chat Room ID</th>
+          <th scope="col">Date Time of Last Message</th>
+          <th scope="col">Clear?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- for loop all the chat rooms here -->
+        <% for (var i = 0; i < ChatRmIDs.length; i++) { %>
+
+                <tr>
+                  <td><%= ChatRmIDs[i] %></td>
+                  <td><%= DateTimeOfLastMsgInEachChatRm[i] %></td>
+                  <td>
+                    <form method="POST" action="/admin/infinity/<%= ChatRmIDs[i] %>/delete">
+                    <button id="clearSpecificChatsID<%= ChatRmIDs[i] %>" type="button" data-toggle="modal" data-target="#exampleModal" onclick="clearspecificchat(this.id)" class="btn btn-danger DeleteSpecificChat"><i class="fas fa-trash-alt"></i> Delete</button>
+                    <button id="clearSpecificChatsBtnID<%= ChatRmIDs[i] %>" type="submit" data-toggle="modal" data-target="#exampleModal" class="btn btn-danger DeleteSpecificChat" hidden><i class="fas fa-trash-alt"></i> Delete</button>
+                </form>
+                  </td>
+                </tr>
+        <% } %>
+
+      </tbody>
+    </table>
+
+    <!-- Modal -->
+<div id="ModalPopUpForDeletion">
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel"></h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="modal-bodyID">
+              <!-- delete msg here -->
+          </div>
+          <div class="modal-footer" id="modalfooter" name="modalfooter">
+            <button type="button" class="btn btn-secondary" style="font-weight: bold;" data-dismiss="modal">Close</button>
+            <button type="button" name="ConfirmDeleteBtnInModal" id="ConfirmDeleteBtnInModal" class="btn btn-danger" style="font-weight: bold;">Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+    function clearspecificchat(ClearSpecificChatID){
+            document.getElementById("modal-bodyID").innerHTML = "";
+            document.getElementById("modal-bodyID").innerHTML += "<p hidden id='idOfDeleteBtn'>" + ClearSpecificChatID + "</p>";
+            document.getElementById("modal-bodyID").innerHTML += "<p>Are you sure to delete this chat room?</p>";
+      $('#exampleModal').modal('show')
+    }
+
+    $("#clearChatsID").click(function(){
+            document.getElementById("modal-bodyID").innerHTML = "";
+            document.getElementById("modal-bodyID").innerHTML += "<p hidden id='idOfDeleteBtn'>clearChatsID</p>";
+            document.getElementById("modal-bodyID").innerHTML += "<p>Are you sure to clear all chat rooms?</p>";
+      $('#exampleModal').modal('show')
+  });
+
+  $('#ModalPopUpForDeletion').on('click', 'button[name$="ConfirmDeleteBtnInModal"]', function () {
+      var idOfBtn = document.getElementById("idOfDeleteBtn").innerHTML;
+      var ClearSpecificChatText = idOfBtn.substring(0, 20);
+      var ClearSpecificChatID = idOfBtn.substring(20, idOfBtn.length);
+
+
+      $('#exampleModal').modal('hide')
+
+      if(idOfBtn == 'clearChatsID')
+      {
+        $('#clearChatsBtnID').click();
+      }
+      else if(ClearSpecificChatText == 'clearSpecificChatsID'){
+        $('#clearSpecificChatsBtnID' + ClearSpecificChatID).click();
+      }
+  });
+</script>
+</body>
+</html>
+
+
+
+
+
+<!-- <div class="row mt-5">
     <div class="col-md-6 m-auto">
         <div class="card card-body text-center">
             <h1><i class="fas fa-ban fa-4x"></i></h1>
@@ -12,10 +141,10 @@
             </form>
             </div>
     </div>
-</div>
+</div> -->
 
 <!-- Modal -->
-<div id="ModalPopUpForDeletion">
+<!-- <div id="ModalPopUpForDeletion">
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -48,4 +177,4 @@
         $('#exampleModal').modal('hide')
         $('#clearChatsBtnID').click();
     });
-  </script>
+  </script> -->

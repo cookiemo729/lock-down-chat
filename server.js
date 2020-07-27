@@ -40,7 +40,9 @@ app.use(function(req, res, next) {
 });
 
 // Routes
-// app.use('/', require('./routes/index.js'));
+app.use('/', require('./routes/admin.js'));
+
+//Ignore Favicon error
 app.use(ignoreFavicon); //Important***
 
 function ignoreFavicon(req, res, next) { //Important***
@@ -137,19 +139,23 @@ app.get('/:id', (req, res) => {
 
 app.post('/:id', async (req, res) => {
   try{
+    var d = new Date();
+
         messageRef.child(req.params.id).push({
             name: req.body.name,
             message: req.body.message,
             textColor: '#000000',
             backgroundTextColor: '#99ffbb',
             owner: 'Student',
-            state: 'visible'
+            state: 'visible',
+            dateTime: d.toLocaleString()
         });
         req.body.textColor = '#000000';
         req.body.backgroundTextColor = '#99ffbb';
         req.body.owner = 'Instructor';
         req.body.state = 'visible';
         req.body.chatID = req.params.id;
+        req.body.dateTime = d.toLocaleString()
 
         var dataArray = [];
         messageRef.child(req.params.id).once("value", function(snapshot) {
@@ -261,18 +267,22 @@ app.get('/:id/instructor', (req, res) => {
 
 app.post('/:id/instructor', async (req, res) => {
   try{
+    var d = new Date();
+
         messageRef.child(req.params.id).push({
             name: req.body.name,
             message: req.body.message,
             textColor: 'blue',
             backgroundTextColor: '#ffffb3',
             owner: 'Instructor',
-            state: 'visible'
-        });
+            state: 'visible',
+            dateTime: d.toLocaleString()
+          });
         req.body.textColor = 'blue';
         req.body.backgroundTextColor = '#ffffb3';
         req.body.owner = 'Instructor';
         req.body.state = 'visible';
+        req.body.dateTime = d.toLocaleString()
 
         var dataArray = [];
         messageRef.child(req.params.id).once("value", function(snapshot) {
@@ -321,15 +331,16 @@ app.get('/:id/instructor/:theMsgID/hide', async (req, res) => {
                 textColor: 'black',
                 backgroundTextColor: '#b3b3b3',
                 owner: snapshot.val().owner,
-                state: 'hidden'
+                state: 'hidden',
+                dateTime: snapshot.val().dateTime
             });
             req.body.theMsgID = req.params.theMsgID;
-            req.body.name = snapshot.val().name;
-            req.body.message = snapshot.val().message;
-            req.body.textColor = 'black';
-            req.body.backgroundTextColor = '#b3b3b3';
-            req.body.owner = snapshot.val().owner;
-            req.body.state = 'hidden';
+            // req.body.name = snapshot.val().name;
+            // req.body.message = snapshot.val().message;
+            // req.body.textColor = 'black';
+            // req.body.backgroundTextColor = '#b3b3b3';
+            // req.body.owner = snapshot.val().owner;
+            // req.body.state = 'hidden';
 
             res.redirect(`/${req.params.id}/instructor`);
             io.emit('messageHide', req.body);
@@ -348,8 +359,9 @@ app.get('/:id/instructor/:theMsgID/unhide', async (req, res) => {
           textColor: '#000000',
           backgroundTextColor: '#99ffbb',
           owner: snapshot.val().owner,
-          state: 'visible'
-      });
+          state: 'visible',
+          dateTime: snapshot.val().dateTime
+        });
     }
     else{
         messageRef.child(req.params.id).child(req.params.theMsgID).set({
@@ -358,7 +370,8 @@ app.get('/:id/instructor/:theMsgID/unhide', async (req, res) => {
           textColor: 'blue',
           backgroundTextColor: '#ffffb3',
           owner: snapshot.val().owner,
-          state: 'visible'
+          state: 'visible',
+          dateTime: snapshot.val().dateTime
       });
     }
     
@@ -387,17 +400,23 @@ app.get('/:id/instructor/clear', async (req, res) => {
 
 })
 
-app.get('/admin/infinity', async (req, res) => {
-  res.render("infinity")
+// app.get('/admin/infinity', async (req, res, next) => {
+//   //Get all Chat Rooms
+//   messageRef.on("value", function(snapshot) {
+//       console.log(snapshot.val());
+//       res.render('infinity');
+//       next();
+//     }, function (errorObject) {
+//       console.log("The read failed: " + errorObject.code);
+//     });
+// })
 
-})
-
-app.post('/admin/infinity', async (req, res) => {
-  let messagesToClear = messageRef;
-  messagesToClear.remove();
-  req.flash('success_msg', 'Successfully cleared all chats!');
-  res.redirect(`/admin/infinity`);
-})
+// app.post('/admin/infinity', async (req, res) => {
+//   let messagesToClear = messageRef;
+//   messagesToClear.remove();
+//   req.flash('success_msg', 'Successfully cleared all chats!');
+//   res.redirect(`/admin/infinity`);
+// })
 
 
 
