@@ -3,7 +3,6 @@ const router = express.Router();
 const database = require('../config/accessFirebase');
 const messageRef = database.ref('/Messages');
 
-
 router.get('/admin/infinity', async (req, res) => {
   //Get all Chat Rooms
   var ChatRmIDArray = [];
