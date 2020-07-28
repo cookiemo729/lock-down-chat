@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+
 const database = require('../config/accessFirebase');
 const messageRef = database.ref('/Messages');
 
@@ -47,11 +48,12 @@ router.get('/admin/infinity', async (req, res) => {
           ChatRmIDArray = ChatRmIDArray.concat(ChatRmIDWithoutDateTime);
           DateTimeOfLastMsgInEachChatRmArray = DateTimeOfLastMsgInEachChatRmArray.concat(WithoutDateTimeOfLastMsgInEachChatRmArray);
 
-          res.render('infinity', { ChatRmIDs: ChatRmIDArray, DateTimeOfLastMsgInEachChatRm: DateTimeOfLastMsgInEachChatRmArray})
+          // res.render('infinity', { ChatRmIDs: ChatRmIDArray, DateTimeOfLastMsgInEachChatRm: DateTimeOfLastMsgInEachChatRmArray})
 
         }, function (errorObject) {
           console.log("The read failed: " + errorObject.code);
         });
+       res.render('infinity', { ChatRmIDs: ChatRmIDArray, DateTimeOfLastMsgInEachChatRm: DateTimeOfLastMsgInEachChatRmArray})
 
   })
   
@@ -60,6 +62,7 @@ router.get('/admin/infinity', async (req, res) => {
     chatsToClear.remove();
     req.flash('success_msg', 'Successfully cleared all chats!');
     res.redirect(`/admin/infinity`);
+    io.emit('adminUpdateAfterClearAllChatRooms', 's');
   })
 
   router.post('/admin/infinity/:ChatRmID/delete', async (req, res) => {

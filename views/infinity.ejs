@@ -37,7 +37,13 @@
     <br/>
     <br/>
     <br/>
+    <div id="flashAlertID">
     <%- include('./partials/messages.ejs'); %>
+  </div>
+    <div id="messageAlertID" class="alert alert-success alert-dismissible fade show" role="alert" hidden>
+
+      
+  </div>
     <table id="adminChatsID" class="table table-striped table-responsive">
       <thead>
         <tr>
@@ -50,7 +56,7 @@
         <!-- for loop all the chat rooms here -->
         <% for (var i = 0; i < ChatRmIDs.length; i++) { %>
 
-                <tr>
+                <tr id="theRowOfChatID<%= ChatRmIDs[i] %>">
                   <td><%= ChatRmIDs[i] %></td>
                   <td><%= DateTimeOfLastMsgInEachChatRm[i] %></td>
                   <td>
@@ -97,15 +103,127 @@
       //and have another function that when render to this page will call the function to resort
     })
 
-    // socket.on('message', addMessages)
+    socket.on('adminNewChat', displayNewChat)
+    socket.on('adminUpdateLastMsgDateTime', updateLastMsgDateTime)
+    socket.on('adminUpdateAfterClearMessages', UpdateAfterClearMessages)
+    socket.on('adminUpdateAfterClearAllChatRooms', UpdateAfterClearAllChatRooms)
+    socket.on('adminUpdateAfterClearSpecificChatRoom', UpdateAfterClearSpecificChatRoom)
+    
+    function displayNewChat(theChat){
+      $("#adminChatsID").find('tbody').append(`<tr id="theRowOfChatID${theChat.chatID}">
+                   <td>${theChat.chatID}</td>
+                   <td>-</td>
+                   <td>
+                     <form method="POST" action="/admin/infinity/${theChat.chatID}/delete">
+                     <button id="clearSpecificChatsID${theChat.chatID}" type="button" data-toggle="modal" data-target="#exampleModal" onclick="clearspecificchat(this.id)" class="btn btn-danger DeleteSpecificChat"><i class="fas fa-trash-alt"></i> Delete</button>
+                     <button id="clearSpecificChatsBtnID${theChat.chatID}" type="submit" data-toggle="modal" data-target="#exampleModal" class="btn btn-danger DeleteSpecificChat" hidden><i class="fas fa-trash-alt"></i> Delete</button>
+                 </form>
+                   </td>
+                 </tr>`);
+    }
 
-    // function addMessages(message){
-    //     $("#Overhere").append(`<div id="${message.theMsgID}" style="background-color: ${message.backgroundTextColor};"> 
-    //         <h4 style="color: ${message.textColor};"> ${message.name} </h4>
-    //         <p style="color: ${message.textColor};"> ${message.message} </p>
-    //         </div>`)
-    // }
+    function updateLastMsgDateTime(theLastMessage){
+      //Update the last message datetime everytime a message is posted in chat room
+      var table = document.getElementById("adminChatsID");
+      var rowIndex = document.getElementById(`theRowOfChatID${theLastMessage.chatID}`).rowIndex;
+      table.rows[rowIndex].cells[1].innerHTML = `${theLastMessage.dateTime}`
+      //call function for sorting table (oldest - newest)
+      checkEverytime();
+    }
 
+    function UpdateAfterClearMessages(theChatID){
+      //Update the last message datetime everytime a message is posted in chat room
+      var table = document.getElementById("adminChatsID");
+      var rowIndex = document.getElementById(`theRowOfChatID${theChatID}`).rowIndex;
+      table.rows[rowIndex].cells[1].innerHTML = `-`
+      //call function for sorting table (oldest - newest)
+      checkEverytime();
+    }
+
+    function UpdateAfterClearAllChatRooms(){
+      //Update the last message datetime everytime a message is posted in chat room
+      var table = document.getElementById("adminChatsID");
+      var tableref = document.getElementById("adminChatsID").getElementsByTagName('tbody')[0];
+      tableref.innerHTML = "";
+      
+      document.getElementById("flashAlertID").innerHTML = '';
+      document.getElementById("messageAlertID").innerHTML = '';
+      document.getElementById("messageAlertID").hidden = false;
+      document.getElementById("messageAlertID").innerHTML = `Successfully cleared all chats!<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                             <span aria-hidden="true">&times;</span>
+                                                             </button>`
+    }
+
+    function UpdateAfterClearSpecificChatRoom(ChatRmID){
+      //Update the last message datetime everytime a message is posted in chat room
+      var table = document.getElementById("adminChatsID");
+      var rowIndex = document.getElementById(`theRowOfChatID${ChatRmID}`).rowIndex;
+      table.deleteRow(rowIndex);
+      
+      document.getElementById("flashAlertID").innerHTML = '';
+      document.getElementById("messageAlertID").innerHTML = '';
+      document.getElementById("messageAlertID").hidden = false;
+      document.getElementById("messageAlertID").innerHTML = `Successfully deleted ${ChatRmID} chat!<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                             <span aria-hidden="true">&times;</span>
+                                                             </button>`
+    }
+
+    function checkEverytime(){
+      var ChatRmIDArray = [];
+      var DateTimeOfLastMsgInEachChatRmArray = [];
+
+      var ChatRmIDWithoutDateTime = [];
+      var WithoutDateTimeOfLastMsgInEachChatRmArray = [];
+
+      var table = document.getElementById("adminChatsID");
+      var tableref = document.getElementById("adminChatsID").getElementsByTagName('tbody')[0];
+
+      for(a = 1; a < table.rows.length; a++){
+        if(table.rows[a].cells[1].innerHTML != '-'){
+          ChatRmIDArray.push(table.rows[a].cells[0].innerHTML)
+          DateTimeOfLastMsgInEachChatRmArray.push(table.rows[a].cells[1].innerHTML)
+        }
+        else{
+          ChatRmIDWithoutDateTime.push(table.rows[a].cells[0].innerHTML)
+          WithoutDateTimeOfLastMsgInEachChatRmArray.push(table.rows[a].cells[1].innerHTML)
+        }
+      }
+
+
+          var list = [];
+          for (var j = 0; j < ChatRmIDArray.length; j++) 
+          list.push({'ChatRmID': ChatRmIDArray[j], 'LastMsgDateTime': DateTimeOfLastMsgInEachChatRmArray[j]});
+          list.sort(function(a, b) {
+            return ((a.LastMsgDateTime < b.LastMsgDateTime) ? -1 : ((a.LastMsgDateTime == b.LastMsgDateTime) ? 0 : 1));
+          });
+
+          for (var k = 0; k < list.length; k++) {
+            ChatRmIDArray[k] = list[k].ChatRmID;
+            DateTimeOfLastMsgInEachChatRmArray[k] = list[k].LastMsgDateTime;
+          }
+
+          ChatRmIDArray = ChatRmIDArray.concat(ChatRmIDWithoutDateTime);
+          DateTimeOfLastMsgInEachChatRmArray = DateTimeOfLastMsgInEachChatRmArray.concat(WithoutDateTimeOfLastMsgInEachChatRmArray);
+
+          tableref.innerHTML = "";
+          for(i = 0; i < ChatRmIDArray.length; i++){
+            tableref.innerHTML += `<tr id="theRowOfChatID${ChatRmIDArray[i]}">
+                  <td>${ChatRmIDArray[i]}</td>
+                  <td>${DateTimeOfLastMsgInEachChatRmArray[i]}</td>
+                  <td>
+                    <form method="POST" action="/admin/infinity/${ChatRmIDArray[i]}/delete">
+                    <button id="clearSpecificChatsID${ChatRmIDArray[i]}" type="button" data-toggle="modal" data-target="#exampleModal" onclick="clearspecificchat(this.id)" class="btn btn-danger DeleteSpecificChat"><i class="fas fa-trash-alt"></i> Delete</button>
+                    <button id="clearSpecificChatsBtnID${ChatRmIDArray[i]}" type="submit" data-toggle="modal" data-target="#exampleModal" class="btn btn-danger DeleteSpecificChat" hidden><i class="fas fa-trash-alt"></i> Delete</button>
+                </form>
+                  </td>
+                </tr>`;
+          }
+          
+
+    }
+
+
+    
     function clearspecificchat(ClearSpecificChatID){
             document.getElementById("modal-bodyID").innerHTML = "";
             document.getElementById("modal-bodyID").innerHTML += "<p hidden id='idOfDeleteBtn'>" + ClearSpecificChatID + "</p>";
@@ -139,59 +257,3 @@
 </script>
 </body>
 </html>
-
-
-
-
-
-<!-- <div class="row mt-5">
-    <div class="col-md-6 m-auto">
-        <div class="card card-body text-center">
-            <h1><i class="fas fa-ban fa-4x"></i></h1>
-            <%- include('./partials/messages.ejs'); %>
-
-            <h4>Lock Down Chat</h4>
-            <br/>
-            <form method="POST" action="/admin/infinity">
-                <button id="clearChatsID" type="button" data-toggle="modal" data-target="#exampleModal" class="btn btn-danger" style="font-weight: bold;">Clear All Chats</button>
-                <button id="clearChatsBtnID" type="submit" data-toggle="modal" data-target="#exampleModal" class="btn btn-danger" style="font-weight: bold;" hidden>Clear All Chats</button>
-            </form>
-            </div>
-    </div>
-</div> -->
-
-<!-- Modal -->
-<!-- <div id="ModalPopUpForDeletion">
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel"></h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body" id="modal-bodyID">
-              Are you sure to clear all messages in this chat room?
-          </div>
-          <div class="modal-footer" id="modalfooter" name="modalfooter">
-            <button type="button" class="btn btn-secondary" style="font-weight: bold;" data-dismiss="modal">Close</button>
-            <button type="button" name="ConfirmDeleteBtnInModal" id="ConfirmDeleteBtnInModal" class="btn btn-danger" style="font-weight: bold;">Clear</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
-
-  
-  <script>
-      $("#clearChatsID").click(function(){
-        $('#exampleModal').modal('show')
-    });
-
-    $('#ModalPopUpForDeletion').on('click', 'button[name$="ConfirmDeleteBtnInModal"]', function () {
-        $('#exampleModal').modal('hide')
-        $('#clearChatsBtnID').click();
-    });
-  </script> -->

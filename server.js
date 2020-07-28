@@ -40,7 +40,7 @@ app.use(function(req, res, next) {
 });
 
 // Routes
-app.use('/', require('./routes/admin.js'));
+// app.use('/', require('./routes/admin.js'));
 
 //Ignore Favicon error
 app.use(ignoreFavicon); //Important***
@@ -65,7 +65,9 @@ app.get('/createChat', (req, res) => {
       name: '',
       message: ''
     });
+    req.body.chatID = message_id
     res.redirect(`/${message_id}`);
+    io.emit("adminNewChat", req.body)
 });
 
 app.get('/:id', (req, res) => {
@@ -123,7 +125,9 @@ app.get('/:id', (req, res) => {
                 message: ''
               });
               req.flash('success_msg', 'Chat Room ' + req.params.id + ' entered');
+              req.body.chatID = req.params.id
               res.redirect(`/${req.params.id}`);
+              io.emit("adminNewChat", req.body)
             }
             else{
               res.render('homepage', { errors });
@@ -167,6 +171,7 @@ app.post('/:id', async (req, res) => {
          req.body.theMsgID = dataArray.slice(-3)[0];
         //  console.log(req.body.theMsgID);
          io.emit('message', req.body);
+         io.emit('adminUpdateLastMsgDateTime', req.body);
 
         }, function (errorObject) {
           console.log("The read failed: " + errorObject.code);
@@ -297,6 +302,7 @@ app.post('/:id/instructor', async (req, res) => {
 
         //  console.log(req.body.theMsgID);
          io.emit('message', req.body);
+         io.emit('adminUpdateLastMsgDateTime', req.body);
 
         }, function (errorObject) {
           console.log("The read failed: " + errorObject.code);
@@ -399,26 +405,80 @@ app.get('/:id/instructor/clear', async (req, res) => {
   messagesToClear.remove()
   res.redirect(`/${req.params.id}/instructor`);
   io.emit('messageClear', req.params.id);
+  io.emit('adminUpdateAfterClearMessages', req.params.id);
 
 })
 
-// app.get('/admin/infinity', async (req, res, next) => {
-//   //Get all Chat Rooms
-//   messageRef.on("value", function(snapshot) {
-//       console.log(snapshot.val());
-//       res.render('infinity');
-//       next();
-//     }, function (errorObject) {
-//       console.log("The read failed: " + errorObject.code);
-//     });
-// })
+app.get('/admin/infinity', async (req, res) => {
+  //Get all Chat Rooms
+  var ChatRmIDArray = [];
+  var DateTimeOfLastMsgInEachChatRmArray = [];
 
-// app.post('/admin/infinity', async (req, res) => {
-//   let messagesToClear = messageRef;
-//   messagesToClear.remove();
-//   req.flash('success_msg', 'Successfully cleared all chats!');
-//   res.redirect(`/admin/infinity`);
-// })
+  var ChatRmIDWithoutDateTime = [];
+  var WithoutDateTimeOfLastMsgInEachChatRmArray = [];
+  
+
+  messageRef.on("value", function(snapshot) {
+      snapshot.forEach((child) => {
+          // ChatRmIDArray.push(child.key)
+          var AllDateTimeOfCurrentChatRm = [];
+          child.forEach((childchild) => {
+              AllDateTimeOfCurrentChatRm.push(childchild.val().dateTime);
+          });
+
+
+          if(AllDateTimeOfCurrentChatRm.length > 2){
+              ChatRmIDArray.push(child.key)
+              DateTimeOfLastMsgInEachChatRmArray.push(AllDateTimeOfCurrentChatRm.slice(-3)[0]);
+          }
+          else{
+              ChatRmIDWithoutDateTime.push(child.key);
+              WithoutDateTimeOfLastMsgInEachChatRmArray.push('-');
+          };
+
+       });
+
+          var list = [];
+          for (var j = 0; j < ChatRmIDArray.length; j++) 
+          list.push({'ChatRmID': ChatRmIDArray[j], 'LastMsgDateTime': DateTimeOfLastMsgInEachChatRmArray[j]});
+          list.sort(function(a, b) {
+            return ((a.LastMsgDateTime < b.LastMsgDateTime) ? -1 : ((a.LastMsgDateTime == b.LastMsgDateTime) ? 0 : 1));
+          });
+
+          for (var k = 0; k < list.length; k++) {
+            ChatRmIDArray[k] = list[k].ChatRmID;
+            DateTimeOfLastMsgInEachChatRmArray[k] = list[k].LastMsgDateTime;
+          }
+
+          ChatRmIDArray = ChatRmIDArray.concat(ChatRmIDWithoutDateTime);
+          DateTimeOfLastMsgInEachChatRmArray = DateTimeOfLastMsgInEachChatRmArray.concat(WithoutDateTimeOfLastMsgInEachChatRmArray);
+
+          // res.render('infinity', { ChatRmIDs: ChatRmIDArray, DateTimeOfLastMsgInEachChatRm: DateTimeOfLastMsgInEachChatRmArray})
+
+        }, function (errorObject) {
+          console.log("The read failed: " + errorObject.code);
+        });
+       res.render('infinity', { ChatRmIDs: ChatRmIDArray, DateTimeOfLastMsgInEachChatRm: DateTimeOfLastMsgInEachChatRmArray})
+
+  })
+  
+  app.post('/admin/infinity', async (req, res) => {
+    let chatsToClear = messageRef;
+    chatsToClear.remove();
+    req.flash('success_msg', 'Successfully cleared all chats!');
+    res.redirect(`/admin/infinity`);
+    io.emit('adminUpdateAfterClearAllChatRooms');
+  })
+
+  app.post('/admin/infinity/:ChatRmID/delete', async (req, res) => {
+    let specificChatToRemove = messageRef.child(req.params.ChatRmID);
+    specificChatToRemove.remove()
+    req.flash('success_msg', 'Successfully deleted ' + req.params.ChatRmID + ' chat!');
+    res.redirect(`/admin/infinity`);
+    io.emit('adminUpdateAfterClearSpecificChatRoom', req.params.ChatRmID);
+  })
+
+
 
 
 
