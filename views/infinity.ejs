@@ -27,10 +27,10 @@
       <h2 class="pagetitle">Admin View</h2>
       <br/>
       <br/>
-      <form method="POST" action="/admin/infinity/Clear4WeeksAgoChatRms">
+      <!-- <form method="POST" action="/admin/infinity/Clear4WeeksAgoChatRms">
         <button id="clear4WeeksAgoChatRmsID" type="button" data-toggle="modal" data-target="#exampleModal" class="btn btn-danger clearAll">Clear 4 Weeks Ago Chat Rooms</button>
         <button id="clear4WeeksAgoChatRmsBtnID" type="submit" data-toggle="modal" data-target="#exampleModal" class="btn btn-danger clearAll" hidden>Clear 4 Weeks Ago Chat Rooms</button>
-    </form>
+    </form> -->
     <br/>
     <br/>
     <br/>
@@ -106,8 +106,6 @@
     var socket = io();
     $(() => {
 
-      //resort over here
-      //and have another function that when render to this page will call the function to resort
     })
 
     socket.on('adminNewChat', displayNewChat)
@@ -158,18 +156,6 @@
       document.getElementById("messageAlertID").innerHTML = `Successfully cleared all chats!<button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                                              <span aria-hidden="true">&times;</span>
                                                              </button>`
-
-      // for(i = 0; i < ChatRmIDsArray.length; i++){
-      //   var rowIndex = document.getElementById(`theRowOfChatID${ChatRmIDsArray[i]}`).rowIndex;
-      //   table.deleteRow(rowIndex);
-      //   }
-
-      //   document.getElementById("flashAlertID").innerHTML = '';
-      //   document.getElementById("messageAlertID").innerHTML = '';
-      //   document.getElementById("messageAlertID").hidden = false;
-      //   document.getElementById("messageAlertID").innerHTML = `Successfully cleared chat rooms from 4 weeks ago!<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      //                                                         <span aria-hidden="true">&times;</span>
-      //                                                         </button>`
     }
 
 
@@ -272,12 +258,12 @@
       $('#exampleModal').modal('show')
   });
 
-  $("#clear4WeeksAgoChatRmsID").click(function(){
-            document.getElementById("modal-bodyID").innerHTML = "";
-            document.getElementById("modal-bodyID").innerHTML += "<p hidden id='idOfDeleteBtn'>clear4WeeksAgoChatRmsID</p>";
-            document.getElementById("modal-bodyID").innerHTML += "<p>Are you sure to clear 4 Weeks ago Chat Rooms?</p>";
-      $('#exampleModal').modal('show')
-  });
+  // $("#clear4WeeksAgoChatRmsID").click(function(){
+  //           document.getElementById("modal-bodyID").innerHTML = "";
+  //           document.getElementById("modal-bodyID").innerHTML += "<p hidden id='idOfDeleteBtn'>clear4WeeksAgoChatRmsID</p>";
+  //           document.getElementById("modal-bodyID").innerHTML += "<p>Are you sure to clear 4 Weeks ago Chat Rooms?</p>";
+  //     $('#exampleModal').modal('show')
+  // });
 
   $('#ModalPopUpForDeletion').on('click', 'button[name$="ConfirmDeleteBtnInModal"]', function () {
       var idOfBtn = document.getElementById("idOfDeleteBtn").innerHTML;
@@ -294,9 +280,9 @@
       else if(ClearSpecificChatText == 'clearSpecificChatsID'){
         $('#clearSpecificChatsBtnID' + ClearSpecificChatID).click();
       }
-      else if(idOfBtn == 'clear4WeeksAgoChatRmsID'){
-        $('#clear4WeeksAgoChatRmsBtnID').click();
-      }
+      // else if(idOfBtn == 'clear4WeeksAgoChatRmsID'){
+      //   $('#clear4WeeksAgoChatRmsBtnID').click();
+      // }
   });
 </script>
 </body>
