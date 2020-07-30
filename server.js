@@ -60,10 +60,13 @@ app.get('/', (req, res) => {
 })
 
 app.get('/createChat', (req, res) => {
+    var d = new Date();
+    var options = { hour12: false };
+
     const message_id = messageRef.push().key;
     messageRef.child(message_id).set({
       name: '',
-      message: ''
+      dateTime: d.toLocaleString('en-US', options)
     });
     req.body.chatID = message_id
     res.redirect(`/${message_id}`);
@@ -71,6 +74,9 @@ app.get('/createChat', (req, res) => {
 });
 
 app.get('/:id', (req, res) => {
+    var d = new Date();
+    var options = { hour12: false };
+
       var messageArray = [];
       var messageIDArray = [];
 
@@ -122,7 +128,7 @@ app.get('/:id', (req, res) => {
             if(haveUpperCase == 1 && haveLowerCase == 1 && have16Characters == 1){
               messageRef.child(req.params.id).set({
                 name: '',
-                message: ''
+                dateTime: d.toLocaleString('en-US', options)
               });
               req.flash('success_msg', 'Chat Room ' + req.params.id + ' entered');
               req.body.chatID = req.params.id
@@ -462,74 +468,74 @@ app.get('/admin/infinity', async (req, res) => {
 
   })
   
-  app.post('/admin/infinity', async (req, res) => {
-
-    var ChatRmIDArray = [];
-    var DateTimeOfLastMsgInEachChatRmArray = [];
-
-    var ChatRmIDWithoutDateTime = [];
-    var WithoutDateTimeOfLastMsgInEachChatRmArray = [];
-  
-    var ChatRmIDToEmit = [];
-
-  messageRef.on("value", function(snapshot) {
-      snapshot.forEach((child) => {
-          var AllDateTimeOfCurrentChatRm = [];
-          child.forEach((childchild) => {
-              AllDateTimeOfCurrentChatRm.push(childchild.val().dateTime);
-          });
-
-
-          if(AllDateTimeOfCurrentChatRm.length > 2){
-              ChatRmIDArray.push(child.key)
-              DateTimeOfLastMsgInEachChatRmArray.push(AllDateTimeOfCurrentChatRm.slice(-3)[0]);
-          }
-          else{
-              ChatRmIDWithoutDateTime.push(child.key);
-              WithoutDateTimeOfLastMsgInEachChatRmArray.push('-');
-          };
-
-       });
-
-        }, function (errorObject) {
-          console.log("The read failed: " + errorObject.code);
-        });
-
-        var list = [];
-          var d = new Date();
-          var options = { hour12: false };
-
-          for (var j = 0; j < ChatRmIDArray.length; j++) 
-          list.push({'ChatRmID': ChatRmIDArray[j], 'LastMsgDateTime': DateTimeOfLastMsgInEachChatRmArray[j]});
-
-          for(x = 0; x < list.length; x++){
-            var result = new Date(list[x].LastMsgDateTime);
-            result.setDate(result.getDate() + 28);
-            // result = result.toLocaleString('en-US', options);
-            // console.log(result);
-            // console.log(d)
-            if(result < d){
-              // console.log("The ID IS : " + list[x].ChatRmID);
-              ChatRmIDToEmit.push(list[x].ChatRmID);
-              // console.log(ChatRmIDToEmit);
-              let specificChatToRemove = messageRef.child(list[x].ChatRmID);
-              specificChatToRemove.remove();
-              // console.log("Deleted")
-            }
-          }
-
-          req.flash('success_msg', 'Successfully cleared chat rooms from 4 weeks ago!');
-          res.redirect(`/admin/infinity`);
-          io.emit('adminUpdateAfterClearAllChatRooms', ChatRmIDToEmit);
-  })
-
   // app.post('/admin/infinity', async (req, res) => {
-  //   let chatsToClear = messageRef;
-  //   chatsToClear.remove();
-  //   req.flash('success_msg', 'Successfully cleared all chats!');
-  //   res.redirect(`/admin/infinity`);
-  //   io.emit('adminUpdateAfterClearAllChatRooms');
+
+  //   var ChatRmIDArray = [];
+  //   var DateTimeOfLastMsgInEachChatRmArray = [];
+
+  //   var ChatRmIDWithoutDateTime = [];
+  //   var WithoutDateTimeOfLastMsgInEachChatRmArray = [];
+  
+  //   var ChatRmIDToEmit = [];
+
+  // messageRef.on("value", function(snapshot) {
+  //     snapshot.forEach((child) => {
+  //         var AllDateTimeOfCurrentChatRm = [];
+  //         child.forEach((childchild) => {
+  //             AllDateTimeOfCurrentChatRm.push(childchild.val().dateTime);
+  //         });
+
+
+  //         if(AllDateTimeOfCurrentChatRm.length > 2){
+  //             ChatRmIDArray.push(child.key)
+  //             DateTimeOfLastMsgInEachChatRmArray.push(AllDateTimeOfCurrentChatRm.slice(-3)[0]);
+  //         }
+  //         else{
+  //             ChatRmIDWithoutDateTime.push(child.key);
+  //             WithoutDateTimeOfLastMsgInEachChatRmArray.push('-');
+  //         };
+
+  //      });
+
+  //       }, function (errorObject) {
+  //         console.log("The read failed: " + errorObject.code);
+  //       });
+
+  //       var list = [];
+  //         var d = new Date();
+  //         var options = { hour12: false };
+
+  //         for (var j = 0; j < ChatRmIDArray.length; j++) 
+  //         list.push({'ChatRmID': ChatRmIDArray[j], 'LastMsgDateTime': DateTimeOfLastMsgInEachChatRmArray[j]});
+
+  //         for(x = 0; x < list.length; x++){
+  //           var result = new Date(list[x].LastMsgDateTime);
+  //           result.setDate(result.getDate() + 28);
+  //           // result = result.toLocaleString('en-US', options);
+  //           // console.log(result);
+  //           // console.log(d)
+  //           if(result < d){
+  //             // console.log("The ID IS : " + list[x].ChatRmID);
+  //             ChatRmIDToEmit.push(list[x].ChatRmID);
+  //             // console.log(ChatRmIDToEmit);
+  //             let specificChatToRemove = messageRef.child(list[x].ChatRmID);
+  //             specificChatToRemove.remove();
+  //             // console.log("Deleted")
+  //           }
+  //         }
+
+  //         req.flash('success_msg', 'Successfully cleared chat rooms from 4 weeks ago!');
+  //         res.redirect(`/admin/infinity`);
+  //         io.emit('adminUpdateAfterClearAllChatRooms', ChatRmIDToEmit);
   // })
+
+  app.post('/admin/infinity', async (req, res) => {
+    let chatsToClear = messageRef;
+    chatsToClear.remove();
+    req.flash('success_msg', 'Successfully cleared all chats!');
+    res.redirect(`/admin/infinity`);
+    io.emit('adminUpdateAfterClearAllChatRooms');
+  })
 
   app.post('/admin/infinity/:ChatRmID/delete', async (req, res) => {
     let specificChatToRemove = messageRef.child(req.params.ChatRmID);
@@ -541,6 +547,52 @@ app.get('/admin/infinity', async (req, res) => {
 
 
 
+  app.post('/admin/infinity/Clear4WeeksAgoChatRms', async (req, res) => {
+
+    var ChatRmIDArray = [];
+    var DateTimeOfEachChatRmArray = [];
+
+    var ChatRmIDToEmit = [];
+
+  messageRef.on("value", function(snapshot) {
+      snapshot.forEach((child) => {         
+              ChatRmIDArray.push(child.key)
+              DateTimeOfEachChatRmArray.push(child.val().dateTime);
+       });
+        }, function (errorObject) {
+          console.log("The read failed: " + errorObject.code);
+        });
+
+        console.log(ChatRmIDArray)
+        console.log(DateTimeOfEachChatRmArray)
+
+
+
+          var list = [];
+          var d = new Date();
+          var options = { hour12: false };
+
+          for (var j = 0; j < ChatRmIDArray.length; j++){
+            list.push({'ChatRmID': ChatRmIDArray[j], 'ChatRmCreationDateTime': DateTimeOfEachChatRmArray[j]})
+          };
+
+          for(x = 0; x < list.length; x++){
+            var result = new Date(list[x].ChatRmCreationDateTime);
+            result.setDate(result.getDate() + 28);
+            // result = result.toLocaleString('en-US', options);
+            // console.log(result);
+            // console.log(d)
+            if(result < d){
+              ChatRmIDToEmit.push(list[x].ChatRmID);
+              let specificChatToRemove = messageRef.child(list[x].ChatRmID);
+              specificChatToRemove.remove();
+            }
+          }
+
+          req.flash('success_msg', 'Successfully cleared chat rooms from 4 weeks ago!');
+          res.redirect(`/admin/infinity`);
+          io.emit('adminUpdateAfter4WeeksAgoChatRooms', ChatRmIDToEmit);
+  })
 
 
 
