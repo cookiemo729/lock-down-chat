@@ -123,7 +123,6 @@
     }
 
     function updateLastMsgDateTime(theLastMessage){
-      //Update the last message datetime everytime a message is posted in chat room
       var table = document.getElementById("adminChatsID");
       var rowIndex = document.getElementById(`theRowOfChatID${theLastMessage.chatID}`).rowIndex;
       table.rows[rowIndex].cells[1].innerHTML = `${theLastMessage.dateTime}`
@@ -140,22 +139,32 @@
       checkEverytime();
     }
 
-    function UpdateAfterClearAllChatRooms(){
-      //Update the last message datetime everytime a message is posted in chat room
+    function UpdateAfterClearAllChatRooms(ChatRmIDsArray){
       var table = document.getElementById("adminChatsID");
-      var tableref = document.getElementById("adminChatsID").getElementsByTagName('tbody')[0];
-      tableref.innerHTML = "";
+      // var tableref = document.getElementById("adminChatsID").getElementsByTagName('tbody')[0];
+      // tableref.innerHTML = "";
       
-      document.getElementById("flashAlertID").innerHTML = '';
-      document.getElementById("messageAlertID").innerHTML = '';
-      document.getElementById("messageAlertID").hidden = false;
-      document.getElementById("messageAlertID").innerHTML = `Successfully cleared all chats!<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                             <span aria-hidden="true">&times;</span>
-                                                             </button>`
+      // document.getElementById("flashAlertID").innerHTML = '';
+      // document.getElementById("messageAlertID").innerHTML = '';
+      // document.getElementById("messageAlertID").hidden = false;
+      // document.getElementById("messageAlertID").innerHTML = `Successfully cleared all chats!<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      //                                                        <span aria-hidden="true">&times;</span>
+      //                                                        </button>`
+
+      for(i = 0; i < ChatRmIDsArray.length; i++){
+        var rowIndex = document.getElementById(`theRowOfChatID${ChatRmIDsArray[i]}`).rowIndex;
+        table.deleteRow(rowIndex);
+        }
+
+        document.getElementById("flashAlertID").innerHTML = '';
+        document.getElementById("messageAlertID").innerHTML = '';
+        document.getElementById("messageAlertID").hidden = false;
+        document.getElementById("messageAlertID").innerHTML = `Successfully cleared chat rooms from 4 weeks ago!<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                              <span aria-hidden="true">&times;</span>
+                                                              </button>`
     }
 
     function UpdateAfterClearSpecificChatRoom(ChatRmID){
-      //Update the last message datetime everytime a message is posted in chat room
       var table = document.getElementById("adminChatsID");
       var rowIndex = document.getElementById(`theRowOfChatID${ChatRmID}`).rowIndex;
       table.deleteRow(rowIndex);
