@@ -87,7 +87,7 @@ app.get('/:id', (req, res) => {
             messageArray.push(child.val());
           });          
           req.flash('success_msg', 'Chat Room ' + req.params.id + ' entered');
-          res.render('lockdownchat', { theMessages: messageArray, theMessagesIDs: messageIDArray, MessageID: req.params.id, success_msg: req.flash('success_msg'), isInstructor: 'false', MySession: req.session });
+          res.render('lockdownchat', { theMessages: messageArray, theMessagesIDs: messageIDArray, MessageID: req.params.id, success_msg: req.flash('success_msg'), isInstructor: 'false' });
 
         }
         else{
@@ -148,9 +148,6 @@ app.get('/:id', (req, res) => {
 
 
 app.post('/:id', async (req, res) => {
-// var theSession = req.session;
-// theSession.name = "Smith";  
-// console.log(req.session)
   try{
     var d = new Date();
     var options = { hour12: false };
@@ -170,8 +167,6 @@ app.post('/:id', async (req, res) => {
         req.body.state = 'visible';
         req.body.chatID = req.params.id;
         req.body.dateTime = d.toLocaleString('en-US', options)
-
-        req.session.OwnMessageName = req.body.name;
 
         var dataArray = [];
         messageRef.child(req.params.id).once("value", function(snapshot) {
@@ -198,7 +193,7 @@ app.post('/:id', async (req, res) => {
                   messageArray.push(child.val());
                 });          
                 // console.log(messageArray);
-              res.render('lockdownchat', { theMessages: messageArray, theMessagesIDs: messageIDArray, MessageID: req.params.id, isInstructor: 'false', MySession: req.session });
+              res.render('lockdownchat', { theMessages: messageArray, theMessagesIDs: messageIDArray, MessageID: req.params.id, isInstructor: 'false' });
       
             }, function (errorObject) {
               console.log("The read failed: " + errorObject.code);
