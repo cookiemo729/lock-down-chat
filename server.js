@@ -87,7 +87,7 @@ app.get('/:id', (req, res) => {
             messageArray.push(child.val());
           });          
           req.flash('success_msg', 'Chat Room ' + req.params.id + ' entered');
-          res.render('lockdownchat', { theMessages: messageArray, theMessagesIDs: messageIDArray, MessageID: req.params.id, success_msg: req.flash('success_msg'), isInstructor: 'false' });
+          res.render('lockdownchat', { theMessages: messageArray, theMessagesIDs: messageIDArray, MessageID: req.params.id, success_msg: req.flash('success_msg'), isInstructor: 'false', OwnMessageName: req.body.name, OwnMessage: req.body.message });
 
         }
         else{
@@ -155,16 +155,16 @@ app.post('/:id', async (req, res) => {
     messageRef.child(req.params.id).push({
             name: req.body.name,
             message: req.body.message,
-            textColor: '#000000',
-            backgroundTextColor: '#99ffbb',
+            textColor: 'black',
+            backgroundTextColor: '#b3b3b3',
             owner: 'Student',
-            state: 'visible',
+            state: 'hidden',
             dateTime: d.toLocaleString('en-US', options)
         });
         req.body.textColor = '#000000';
-        req.body.backgroundTextColor = '#99ffbb';
-        req.body.owner = 'Instructor';
-        req.body.state = 'visible';
+        req.body.backgroundTextColor = '#b3b3b3';
+        req.body.owner = 'Student';
+        req.body.state = 'hidden';
         req.body.chatID = req.params.id;
         req.body.dateTime = d.toLocaleString('en-US', options)
 
@@ -193,7 +193,7 @@ app.post('/:id', async (req, res) => {
                   messageArray.push(child.val());
                 });          
                 // console.log(messageArray);
-              res.render('lockdownchat', { theMessages: messageArray, theMessagesIDs: messageIDArray, MessageID: req.params.id, isInstructor: 'false' });
+              res.render('lockdownchat', { theMessages: messageArray, theMessagesIDs: messageIDArray, MessageID: req.params.id, isInstructor: 'false', OwnMessageName: req.body.name, OwnMessage: req.body.message });
       
             }, function (errorObject) {
               console.log("The read failed: " + errorObject.code);
@@ -339,16 +339,31 @@ app.post('/:id/instructor', async (req, res) => {
 
 app.get('/:id/instructor/:theMsgID/hide', async (req, res) => {
         messageRef.child(req.params.id).child(req.params.theMsgID).once("value", function(snapshot) {
-          messageRef.child(req.params.id).child(req.params.theMsgID).set({
+          if(snapshot.val().owner == 'Student'){
+            messageRef.child(req.params.id).child(req.params.theMsgID).set({
+                  name: snapshot.val().name,
+                  message: snapshot.val().message,
+                  textColor: 'black',
+                  backgroundTextColor: '#b3b3b3',
+                  owner: snapshot.val().owner,
+                  state: 'hidden',
+                  dateTime: snapshot.val().dateTime
+              });
+          }
+          else{
+              messageRef.child(req.params.id).child(req.params.theMsgID).set({
                 name: snapshot.val().name,
                 message: snapshot.val().message,
-                textColor: 'black',
+                textColor: 'blue',
                 backgroundTextColor: '#b3b3b3',
                 owner: snapshot.val().owner,
                 state: 'hidden',
                 dateTime: snapshot.val().dateTime
             });
+          }
+
             req.body.theMsgID = req.params.theMsgID;
+            req.body.chatID = req.params.id;
             // req.body.name = snapshot.val().name;
             // req.body.message = snapshot.val().message;
             // req.body.textColor = 'black';
@@ -364,7 +379,7 @@ app.get('/:id/instructor/:theMsgID/hide', async (req, res) => {
         });      
 })
 
-app.get('/:id/instructor/:theMsgID/unhide', async (req, res) => {
+app.get('/:id/instructor/:theMsgID/broadcast', async (req, res) => {
   messageRef.child(req.params.id).child(req.params.theMsgID).once("value", function(snapshot) {
       if(snapshot.val().owner == 'Student'){
         messageRef.child(req.params.id).child(req.params.theMsgID).set({
@@ -390,15 +405,16 @@ app.get('/:id/instructor/:theMsgID/unhide', async (req, res) => {
     }
     
       req.body.theMsgID = req.params.theMsgID;
+      req.body.chatID = req.params.id;
       // req.body.name = snapshot.val().name;
       // req.body.message = snapshot.val().message;
       // req.body.textColor = '#000000';
       // req.body.backgroundTextColor = '#99ffbb';
-      // req.body.owner = snapshot.val().owner;
+      req.body.owner = snapshot.val().owner;
       // req.body.state = 'visible';
 
       res.redirect(`/${req.params.id}/instructor`);
-      io.emit('messageUnhide', req.body);
+      io.emit('messageBroadcast', req.body);
       
   }, function (errorObject) {
     console.log("The read failed: " + errorObject.code);

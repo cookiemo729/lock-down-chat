@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My First Node App</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
   <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
@@ -52,43 +51,68 @@
     <% } %>
 
     <% if(isInstructor == 'false') { %>
-    <div id="messagesStudent<%= MessageID %>">
+        <div style="width: 45%; float: left;" id="MyMessage">
+            <h3 style="text-decoration: underline;">My Message</h3>
+
+        </div>
+    <div style="width: 50%; float: right;" id="messagesStudent<%= MessageID %>">
+        <h3 style="text-decoration: underline;">Broadcast</h3>
         <% for(var i = 0; i < theMessages.length - 2; i++) { %>
-            <!-- if(message is not hidden){ display the bottom } no else -->
-                <% if(theMessages[i].state == 'visible') { %>
-                <div id="<%= theMessagesIDs[i] %>" style="background-color: <%= theMessages[i].backgroundTextColor %>;">
-                <h4 style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].name %></h4>
-                <p style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].message %></p>
+            <% if(theMessages[i].owner == 'Student') { %>
+                <% if(theMessages[i].state == 'hidden') { %>
+                <div id="<%= theMessagesIDs[i] %>" style="background-color: #99ffbb; display: none;">
+                    <!-- <div class="state" hidden><%= theMessagesIDs[i] %><%= theMessages[i].state %></div> -->
+                        <h4><%= theMessages[i].name %></h4>
+                        <p><%= theMessages[i].message %></p>
                 </div>
                 <% } else { %>
-                    <div id="<%= theMessagesIDs[i] %>" style="background-color: <%= theMessages[i].backgroundTextColor %>;" hidden>
-                        <h4 style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].name %></h4>
-                        <p style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].message %></p>
+                    <div id="<%= theMessagesIDs[i] %>" style="background-color: #99ffbb; display: block;">
+                        <!-- <div class="state" hidden><%= theMessagesIDs[i] %><%= theMessages[i].state %></div> -->
+                            <h4><%= theMessages[i].name %></h4>
+                            <p><%= theMessages[i].message %></p>
                     </div>
                 <% } %>
+
+            <% } else { %>
+                <% if(theMessages[i].state == 'hidden') { %>
+                <div id="<%= theMessagesIDs[i] %>" style="background-color: #ffffb3; display: none;">
+                    <!-- <div class="state" hidden><%= theMessagesIDs[i] %><%= theMessages[i].state %></div> -->
+                        <h4 style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].name %></h4>
+                        <p style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].message %></p>
+                </div>
+                <% } else { %>
+                    <div id="<%= theMessagesIDs[i] %>" style="background-color: #ffffb3; display: block;">
+                        <!-- <div class="state" hidden><%= theMessagesIDs[i] %><%= theMessages[i].state %></div> -->
+                            <h4 style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].name %></h4>
+                            <p style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].message %></p>
+                    </div>
+                <% } %>    
+            <% } %>
         <% } %>
 
     </div>
     <% } else{ %>
         <div id="messagesInstructor<%= MessageID %>">
             <% for(var i = 0; i < theMessages.length - 2; i++) { %>
-                <div style="background-color: <%= theMessages[i].backgroundTextColor %>;">
-                    <!-- if msg is hidden, button text is 'unhide' else it is hide -->
-                    <!-- hide post to /:id/instructor/hide -->
-                    <% if(theMessages[i].state == 'visible') { %>
-                    <a href="/<%= MessageID %>/instructor/<%= theMessagesIDs[i] %>/hide" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Hide</a>
+                <div id="Instructor<%= theMessagesIDs[i] %>" style="background-color: <%= theMessages[i].backgroundTextColor %>;">
+                    <% if(theMessages[i].state != 'visible') { %>
+                    <a href="/<%= MessageID %>/instructor/<%= theMessagesIDs[i] %>/broadcast" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Broadcast</a>
                     <% } else { %>
-                    <a href="/<%= MessageID %>/instructor/<%= theMessagesIDs[i] %>/unhide" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Unhide</a>
+                    <a href="/<%= MessageID %>/instructor/<%= theMessagesIDs[i] %>/hide" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Hide</a>
                     <% } %>
-                        <!-- unhide post to /:id/instructor/unhide -->
                     <h4 style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].name %></h4>
                 <p style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].message %></p>
                 </div>
             <% } %>
         </div>
     <% } %>
-
 </div>
+<% if(isInstructor == 'false') { %>
+    <div id="PendingMessagesDivID" hidden>
+        <p id="PendingMessageName"><%= OwnMessageName %></p>
+        <p id="PendingMessage"><%= OwnMessage %></p>
+    </div>
+<% } %>
 
 <!-- Modal -->
 <div id="ModalPopUpForDeletion">
@@ -115,34 +139,154 @@
 <script>
    var socket = io();
     $(() => {
+        // var noOfDivForstate = $('.state').length;
+        //     var DivForstateIndex = 0;
+        //     do {
+        //         var DivForstateIDvar = $('.state').eq(DivForstateIndex);
+        //         DivForstateIndex++;
+        //         DivForstateIDvar.attr("id", "state" + DivForstateIndex);
+        //     } while (DivForstateIndex < noOfDivForstate);
 
+        //     for(f = 0; f < noOfDivForstate; f++){
+        //         var messageidAndState = document.getElementById("state" + (f+1)).innerHTML;
+
+        //         if(messageidAndState.substring(messageidAndState.length - 6) == 'hidden'){
+        //             var GetMsgID = messageidAndState.substring(0, messageidAndState.length - 6)
+        //             $("#" + GetMsgID).hide();
+        //         }
+        //     }
+
+
+        var storedHasSth = 0;
+        var myMessageName = document.getElementById("PendingMessageName").innerHTML;
+        var myMessage = document.getElementById("PendingMessage").innerHTML;
+        // var myMessageCurrentState = document.getElementById("PendingMessageCurrentState").innerHTML;
+
+        var myMessageNameStored = JSON.parse(sessionStorage.getItem("OwnMessageName"));
+        var myMessageStored = JSON.parse(sessionStorage.getItem("OwnMessage"));
+        // var myMessageCurrentStateStored = JSON.parse(sessionStorage.getItem("OwnMessageCurrentState"));
+
+        if(myMessageNameStored == null || myMessageNameStored == ""){
+            storedHasSth = 0;
+        }
+        else{
+            storedHasSth = 1;
+        }
+        
+        if(storedHasSth == 0){
+            var MessageNameToAdd = [];
+            var MessageToAdd = [];
+            // var MessageCurrentStateToAdd = [];
+
+            MessageNameToAdd.push(myMessageName);
+            MessageToAdd.push(myMessage);
+            // MessageCurrentStateToAdd.push(myMessageCurrentState);
+
+            window.sessionStorage.setItem("OwnMessageName", JSON.stringify(MessageNameToAdd))
+            window.sessionStorage.setItem("OwnMessage", JSON.stringify(MessageToAdd))
+            // window.sessionStorage.setItem("OwnMessageCurrentState", JSON.stringify(MessageCurrentStateToAdd))
+        }
+        else{
+            var MessageNameToAdd = [];
+            var MessageToAdd = [];
+            // var MessageCurrentStateToAdd = [];
+
+            for(i = 0; i < myMessageNameStored.length; i++){
+                MessageNameToAdd.push(myMessageNameStored[i]);
+                MessageToAdd.push(myMessageStored[i]);
+                // MessageCurrentStateToAdd.push(myMessageCurrentStateStored[i]);
+            }
+            MessageNameToAdd.push(myMessageName);
+            MessageToAdd.push(myMessage);
+            // MessageCurrentStateToAdd.push(myMessageCurrentState);
+
+            window.sessionStorage.setItem("OwnMessageName", JSON.stringify(MessageNameToAdd))
+            window.sessionStorage.setItem("OwnMessage", JSON.stringify(MessageToAdd))
+            // window.sessionStorage.setItem("OwnMessageCurrentState", JSON.stringify(MessageCurrentStateToAdd))
+        }
+
+        myMessageNameStored = JSON.parse(sessionStorage.getItem("OwnMessageName"));
+        myMessageStored = JSON.parse(sessionStorage.getItem("OwnMessage"));
+        // myMessageCurrentStateStored = JSON.parse(sessionStorage.getItem("OwnMessageCurrentState"));
+       
+        for(m = 0; m < myMessageNameStored.length; m++){
+            if(myMessageNameStored[m] != ""){
+                $("#MyMessage").append(`<div style="background-color: #b3b3b3">
+                <h4 style="color: black;">${myMessageNameStored[m]}</h4>
+                <p style="color: black;">${myMessageStored[m]}</p>
+                </div>`)
+            }
+        }
+
+            
     })
 
     socket.on('message', addMessages)
     socket.on('messageHide', hideMessages)
-    socket.on('messageUnhide', UnhideMessages)
+    socket.on('messageBroadcast', BroadcastMessages)
     socket.on('messageClear', ClearMessages)
 
     function addMessages(message){
-        $("#messagesStudent" + message.chatID).append(`<div id="${message.theMsgID}" style="background-color: ${message.backgroundTextColor};"> 
-            <h4 style="color: ${message.textColor};"> ${message.name} </h4>
-            <p style="color: ${message.textColor};"> ${message.message} </p>
-            </div>`)
+            if(message.owner == "Instructor"){
+                $("#messagesStudent" + message.chatID).append(`<div id="${message.theMsgID}" style="background-color: ${message.backgroundTextColor};"> 
+                <h4 style="color: ${message.textColor};"> ${message.name} </h4>
+                <p style="color: ${message.textColor};"> ${message.message} </p>
+                </div>`)
 
-        $("#messagesInstructor" + message.chatID).append(`<div style="background-color: ${message.backgroundTextColor};">
-                    <a href="/<%= MessageID %>/instructor/${message.theMsgID}/hide" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Hide</a>
+                $("#messagesInstructor" + message.chatID).append(`<div id="Instructor${message.theMsgID}" style="background-color: ${message.backgroundTextColor};">
+                    <a href="/${message.chatID}/instructor/${message.theMsgID}/hide" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Hide</a>
                     <h4 style="color: ${message.textColor};">${message.name}</h4>
                 <p style="color: ${message.textColor};">${message.message}</p>
                 </div>`)
+            }
+            else{
+                $("#messagesStudent" + message.chatID).append(`<div id="${message.theMsgID}" style="background-color: #99ffbb; display: none">
+                <h4> ${message.name} </h4>
+                <p> ${message.message} </p>
+                </div>`)
+                // $("#" + message.theMsgID).hide();
+
+                $("#messagesInstructor" + message.chatID).append(`<div id="Instructor${message.theMsgID}" style="background-color: ${message.backgroundTextColor};">
+                    <a href="/${message.chatID}/instructor/${message.theMsgID}/broadcast" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Broadcast</a>
+                    <h4 style="color: ${message.textColor};">${message.name}</h4>
+                <p style="color: ${message.textColor};">${message.message}</p>
+                </div>`)
+            }
+
+        // $("#messagesInstructor" + message.chatID).append(`<div id="Instructor${message.theMsgID}" style="background-color: ${message.backgroundTextColor};">
+        //             <a href="/${message.chatID}/instructor/${message.theMsgID}/hide" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Hide</a>
+        //             <h4 style="color: ${message.textColor};">${message.name}</h4>
+        //         <p style="color: ${message.textColor};">${message.message}</p>
+        //         </div>`)
     }
-    function hideMessages(hiddenMsgID){
-        $("#" + hiddenMsgID.theMsgID).hide();
+    function hideMessages(hiddenMsg){
+        // $("#" + hiddenMsg.theMsgID).hide();
+        $("#" + hiddenMsg.theMsgID).css({"display": "none"});
+        $("#Instructor" + hiddenMsg.theMsgID).css({"background-color": "#b3b3b3"});
+        var str = document.getElementById("Instructor" + hiddenMsg.theMsgID).innerHTML;
+        str = str.replace("Hide", "Broadcast")
+        str = str.replace("/hide", "/broadcast")
+        // str = str.replace("/" + hiddenMsg.chatID + "/instructor/" + hiddenMsg.chatID + "/hide", "/" + hiddenMsg.chatID + "/instructor/" + hiddenMsg.chatID + "/unhide")
+        $("#Instructor" + hiddenMsg.theMsgID).html(str);
     }
-    function UnhideMessages(hiddenMsgID){
-        $("#" + hiddenMsgID.theMsgID).show();
+    function BroadcastMessages(hiddenMsg){
+        // $("#" + hiddenMsg.theMsgID).show();
+        $("#" + hiddenMsg.theMsgID).css({"display": "block"});
+        if(hiddenMsg.owner == "Instructor"){
+            $("#Instructor" + hiddenMsg.theMsgID).css({"background-color": "#ffffb3"});
+        }
+        else{
+            $("#Instructor" + hiddenMsg.theMsgID).css({"background-color": "#99ffbb"});
+        }
+        var str = document.getElementById("Instructor" + hiddenMsg.theMsgID).innerHTML;
+        str = str.replace("Broadcast", "Hide")
+        str = str.replace("/broadcast", "/hide")
+        // str = str.replace("/" + hiddenMsg.chatID + "/instructor/" + hiddenMsg.chatID + "/unhide", "/" + hiddenMsg.chatID + "/instructor/" + hiddenMsg.chatID + "/hide")
+        $("#Instructor" + hiddenMsg.theMsgID).html(str);
     }
     function ClearMessages(theChatID){
-        $("#messagesStudent" + theChatID).html('');
+        $("#messagesStudent" + theChatID).html('<h3 style="text-decoration: underline;">Broadcast</h3>');
+        $("#messagesInstructor" + theChatID).html('');
     }
 
     $("#clearMessagesID").click(function(){
