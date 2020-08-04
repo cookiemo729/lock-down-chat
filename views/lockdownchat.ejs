@@ -11,9 +11,10 @@
 <div class="container">
     <br>
     <%- include('./partials/messages.ejs'); %>
-
     <% if(isInstructor == 'false') { %>
     <form method="POST" action="/<%= MessageID %>">
+        <img style="float: right;  width: 30%;" src="../public/images/nyplogo.gif" alt="NYPLOGO">
+
     <div class="jumbotron">
         <h1 class="display-4">Send Message</h1>
         <h6>Only post questions about the eSA in this chat room. If you breach any of the assessment regulations or instructions by posting the answers in the chat room, you are liable to disciplinary action.</h6>
@@ -35,6 +36,7 @@
 <br/>
 <br/>
         <form method="POST" action="/<%= MessageID %>/instructor">
+            <img style="float: right; width: 30%;" src="../public/images/nyplogo.gif" alt="NYPLOGO">
             <div class="jumbotron">
                 <h1 class="display-4">Instructor</h1>
                 <h1 class="display-4">Send Message</h1>
@@ -95,6 +97,7 @@
         <div id="messagesInstructor<%= MessageID %>">
             <% for(var i = 0; i < theMessages.length - 2; i++) { %>
                 <div id="Instructor<%= theMessagesIDs[i] %>" style="background-color: <%= theMessages[i].backgroundTextColor %>;">
+                        <a href="/<%= MessageID %>/instructor/<%= theMessagesIDs[i] %>/reply" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Reply</a>
                     <% if(theMessages[i].state != 'visible') { %>
                     <a href="/<%= MessageID %>/instructor/<%= theMessagesIDs[i] %>/broadcast" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Broadcast</a>
                     <% } else { %>

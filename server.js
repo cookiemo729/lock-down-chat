@@ -16,6 +16,7 @@ app.set('view engine', 'ejs');
 // Express body parser
 // app.use(express.static(__dirname));
 // app.use(bodyParser.json());
+app.use('/public/images/', express.static('./public/images'));
 app.use(express.urlencoded({ extended: true }));
 // app.use(bodyParser.urlencoded({extended: false}))
 
