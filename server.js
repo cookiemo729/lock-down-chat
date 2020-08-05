@@ -7,6 +7,7 @@ const expressLayouts = require('express-ejs-layouts');
 const flash = require('connect-flash');
 const session = require('express-session');
 const database = require('./config/accessFirebase');
+const { Console } = require('console');
 var PORT = process.env.PORT || 3000;
 
 // EJS
@@ -81,14 +82,27 @@ app.get('/:id', (req, res) => {
       var messageArray = [];
       var messageIDArray = [];
 
+      var repliesArray = [];
+      var MsgIDOfrepliesArray = [];
+      var repliesIDArray = [];
+
       messageRef.child(req.params.id).once("value", function(snapshot) {
         if(snapshot.exists()){
           snapshot.forEach((child) => {
             messageIDArray.push(child.key);
             messageArray.push(child.val());
-          });          
+
+            child.forEach((childchild) => {
+              if(childchild.key.substring(0, 1) == '-'){
+                MsgIDOfrepliesArray.push(child.key);
+                repliesArray.push(childchild.val());
+                repliesIDArray.push(childchild.key)
+              }
+            })
+          });
+
           req.flash('success_msg', 'Chat Room ' + req.params.id + ' entered');
-          res.render('lockdownchat', { theMessages: messageArray, theMessagesIDs: messageIDArray, MessageID: req.params.id, success_msg: req.flash('success_msg'), isInstructor: 'false', OwnMessageName: req.body.name, OwnMessage: req.body.message });
+          res.render('lockdownchat', { theMessages: messageArray, theMessagesIDs: messageIDArray, MessageID: req.params.id, success_msg: req.flash('success_msg'), isInstructor: 'false', OwnMessageName: req.body.name, OwnMessage: req.body.message, OwnMessageID: "", OwnMessageDateTime: "", repliesArray: repliesArray, MsgIDOfrepliesArray: MsgIDOfrepliesArray, repliesIDArray: repliesIDArray });
 
         }
         else{
@@ -188,13 +202,25 @@ app.post('/:id', async (req, res) => {
         var messageArray = [];
         var messageIDArray = [];
 
+        var repliesArray = [];
+        var MsgIDOfrepliesArray = [];
+        var repliesIDArray = [];
+        
           messageRef.child(req.params.id).once("value", function(snapshot) {
               snapshot.forEach((child) => {
                   messageIDArray.push(child.key);
                   messageArray.push(child.val());
+
+                  child.forEach((childchild) => {
+                    if(childchild.key.substring(0, 1) == '-'){
+                      MsgIDOfrepliesArray.push(child.key);
+                      repliesArray.push(childchild.val());
+                      repliesIDArray.push(childchild.key)
+                    }
+                  })
                 });          
-                // console.log(messageArray);
-              res.render('lockdownchat', { theMessages: messageArray, theMessagesIDs: messageIDArray, MessageID: req.params.id, isInstructor: 'false', OwnMessageName: req.body.name, OwnMessage: req.body.message });
+                // console.log(messageIDArray.slice(-3)[0]);
+              res.render('lockdownchat', { theMessages: messageArray, theMessagesIDs: messageIDArray, MessageID: req.params.id, isInstructor: 'false', OwnMessageName: req.body.name, OwnMessage: req.body.message, OwnMessageID: messageIDArray.slice(-3)[0], OwnMessageDateTime: req.body.dateTime, repliesArray: repliesArray, MsgIDOfrepliesArray: MsgIDOfrepliesArray, repliesIDArray: repliesIDArray });
       
             }, function (errorObject) {
               console.log("The read failed: " + errorObject.code);
@@ -210,18 +236,33 @@ app.post('/:id', async (req, res) => {
 })
 
 app.get('/:id/instructor', (req, res) => {
+    var d = new Date();
+    var options = { hour12: false };
+
     var messageArray = [];
     var messageIDArray = [];
+
+    var repliesArray = [];
+    var MsgIDOfrepliesArray = [];
+    var repliesIDArray = [];
 
     messageRef.child(req.params.id).once("value", function(snapshot) {
       if(snapshot.exists()){
         snapshot.forEach((child) => {
           messageIDArray.push(child.key);
           messageArray.push(child.val());
-        });          
-        // req.flash('success_msg', 'Chat Room ' + req.params.id + ' entered as instructor');
-        res.render('lockdownchat', { theMessages: messageArray, theMessagesIDs: messageIDArray, MessageID: req.params.id, success_msg: req.flash('success_msg'), isInstructor: 'true' });
 
+            child.forEach((childchild) => {
+              if(childchild.key.substring(0, 1) == '-'){
+                MsgIDOfrepliesArray.push(child.key);
+                repliesArray.push(childchild.val());
+                repliesIDArray.push(childchild.key)
+              }
+            })
+        });
+
+        // req.flash('success_msg', 'Chat Room ' + req.params.id + ' entered as instructor');
+        res.render('lockdownchat', { theMessages: messageArray, theMessagesIDs: messageIDArray, MessageID: req.params.id, success_msg: req.flash('success_msg'), isInstructor: 'true', repliesArray: repliesArray, MsgIDOfrepliesArray: MsgIDOfrepliesArray, repliesIDArray: repliesIDArray });
       }
       else{
         let errors = [];
@@ -261,7 +302,7 @@ app.get('/:id/instructor', (req, res) => {
           if(haveUpperCase == 1 && haveLowerCase == 1 && have16Characters == 1){
             messageRef.child(req.params.id).set({
               name: '',
-              message: ''
+              dateTime: d.toLocaleString('en-US', options)
             });
             // req.flash('success_msg', 'Chat Room ' + req.params.id + ' entered as instructor');
             res.redirect(`/${req.params.id}/instructor`);
@@ -318,12 +359,24 @@ app.post('/:id/instructor', async (req, res) => {
         var messageArray = [];
         var messageIDArray = [];
 
+        var repliesArray = [];
+        var MsgIDOfrepliesArray = [];
+        var repliesIDArray = [];
+
           messageRef.child(req.params.id).once("value", function(snapshot) {
               snapshot.forEach((child) => {
                   messageIDArray.push(child.key);
                   messageArray.push(child.val());
-                });          
-              res.render('lockdownchat', { theMessages: messageArray, theMessagesIDs: messageIDArray, MessageID: req.params.id, isInstructor: 'true' });
+
+                  child.forEach((childchild) => {
+                    if(childchild.key.substring(0, 1) == '-'){
+                      MsgIDOfrepliesArray.push(child.key);
+                      repliesArray.push(childchild.val());
+                      repliesIDArray.push(childchild.key)
+                    }
+                  })
+                });
+              res.render('lockdownchat', { theMessages: messageArray, theMessagesIDs: messageIDArray, MessageID: req.params.id, isInstructor: 'true', repliesArray: repliesArray, MsgIDOfrepliesArray: MsgIDOfrepliesArray, repliesIDArray: repliesIDArray });
       
             }, function (errorObject) {
               console.log("The read failed: " + errorObject.code);
@@ -341,7 +394,7 @@ app.post('/:id/instructor', async (req, res) => {
 app.get('/:id/instructor/:theMsgID/hide', async (req, res) => {
         messageRef.child(req.params.id).child(req.params.theMsgID).once("value", function(snapshot) {
           if(snapshot.val().owner == 'Student'){
-            messageRef.child(req.params.id).child(req.params.theMsgID).set({
+            messageRef.child(req.params.id).child(req.params.theMsgID).update({
                   name: snapshot.val().name,
                   message: snapshot.val().message,
                   textColor: 'black',
@@ -352,7 +405,7 @@ app.get('/:id/instructor/:theMsgID/hide', async (req, res) => {
               });
           }
           else{
-              messageRef.child(req.params.id).child(req.params.theMsgID).set({
+              messageRef.child(req.params.id).child(req.params.theMsgID).update({
                 name: snapshot.val().name,
                 message: snapshot.val().message,
                 textColor: 'blue',
@@ -383,7 +436,7 @@ app.get('/:id/instructor/:theMsgID/hide', async (req, res) => {
 app.get('/:id/instructor/:theMsgID/broadcast', async (req, res) => {
   messageRef.child(req.params.id).child(req.params.theMsgID).once("value", function(snapshot) {
       if(snapshot.val().owner == 'Student'){
-        messageRef.child(req.params.id).child(req.params.theMsgID).set({
+        messageRef.child(req.params.id).child(req.params.theMsgID).update({
           name: snapshot.val().name,
           message: snapshot.val().message,
           textColor: '#000000',
@@ -394,7 +447,7 @@ app.get('/:id/instructor/:theMsgID/broadcast', async (req, res) => {
         });
     }
     else{
-        messageRef.child(req.params.id).child(req.params.theMsgID).set({
+        messageRef.child(req.params.id).child(req.params.theMsgID).update({
           name: snapshot.val().name,
           message: snapshot.val().message,
           textColor: 'blue',
@@ -609,6 +662,29 @@ app.get('/admin/infinity', async (req, res) => {
           req.flash('success_msg', 'Successfully cleared chat rooms from 4 weeks ago!');
           res.redirect(`/admin/infinity`);
           io.emit('adminUpdateAfter4WeeksAgoChatRooms', ChatRmIDToEmit);
+  })
+
+  app.post('/:id/instructor/:theMsgID/reply', async (req, res) => {
+    var d = new Date();
+    var options = { hour12: false };
+
+    var newReply = messageRef.child(req.params.id).child(req.params.theMsgID).push({
+          name: req.body.replyName,
+          message: req.body.replyMessage,
+          textColor: 'blue',
+          backgroundTextColor: '#ffffb3',
+          owner: 'Instructor',
+          state: 'visible',
+          dateTime: d.toLocaleString('en-US', options)
+      });
+
+      req.body.replyID = (await newReply).key;
+      req.body.theMsgID = req.params.theMsgID;
+      req.body.textColor = 'blue';
+      req.body.dateTime = d.toLocaleString('en-US', options);
+
+      res.redirect(`/${req.params.id}/instructor`);
+      io.emit('repliesAdded', req.body);
   })
 
 

@@ -6,8 +6,19 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+  
+  <script>
+      $(document).ready(function() {
+        $(document).scrollTop($(document).height());    
+      });
+  </script>
 </head>
 <body>
+    <style>
+        .privateReply{
+            background-color: #E9D9E9;
+        }
+    </style>
 <div class="container">
     <br>
     <%- include('./partials/messages.ejs'); %>
@@ -16,14 +27,14 @@
         <img style="float: right;  width: 30%;" src="../public/images/nyplogo.gif" alt="NYPLOGO">
 
     <div class="jumbotron">
-        <h1 class="display-4">Send Message</h1>
+        <h1 class="display-4">Welcome!</h1>
         <h6>Only post questions about the eSA in this chat room. If you breach any of the assessment regulations or instructions by posting the answers in the chat room, you are liable to disciplinary action.</h6>
         <br>
-        <input id="name" name="name" class="form-control" placeholder="Name (Module Group)" required>
+        <!-- <input id="name" name="name" class="form-control" placeholder="Name (Module Group)" required>
         <br>
         <textarea id="message" name="message" class="form-control" placeholder="Your Message Here" required></textarea>
         <br>
-        <button id="send" type="submit" class="btn btn-success">Send</button>
+        <button id="send" type="submit" class="btn btn-success">Send</button> -->
     </div>
     </form>
     <% } else{ %>
@@ -35,14 +46,142 @@
 <br/>
 <br/>
 <br/>
-        <form method="POST" action="/<%= MessageID %>/instructor">
+        <!-- <form method="POST" action="/<%= MessageID %>/instructor"> -->
             <img style="float: right; width: 30%;" src="../public/images/nyplogo.gif" alt="NYPLOGO">
             <div class="jumbotron">
                 <h1 class="display-4">Instructor</h1>
-                <h1 class="display-4">Send Message</h1>
+                <!-- <h1 class="display-4">Send Message</h1> -->
                 <h6>Only post questions about the eSA in this chat room. If you breach any of the assessment regulations or instructions by posting the answers in the chat room, you are liable to disciplinary action.</h6>
                 <br>
-                <input id="name" name="name" class="form-control" placeholder="Name (Module Group)" required>
+                <!-- <input id="name" name="name" class="form-control" placeholder="Name" required>
+                <br>
+                <textarea id="message" name="message" class="form-control" placeholder="Your Message Here" required></textarea>
+                <br>
+                <button id="send" type="submit" class="btn btn-success">Send</button> -->
+            </div>
+            <!-- </form> -->
+
+    <% } %>
+
+    <% if(isInstructor == 'false') { %>
+        <div>
+            <div style="width: 45%; float: left;" id="MyMessage">
+                <h3 style="text-decoration: underline;">My Message</h3>
+
+            </div>
+        <div style="width: 50%; float: right;" id="messagesStudent<%= MessageID %>">
+            <h3 style="text-decoration: underline;">Broadcast</h3>
+            <% for(var i = 0; i < theMessages.length - 2; i++) { %>
+                <% if(theMessages[i].owner == 'Student') { %>
+                    <% if(theMessages[i].state == 'hidden') { %>
+                    <div id="<%= theMessagesIDs[i] %>" style="background-color: #99ffbb; display: none;">
+                        <!-- <div class="state" hidden><%= theMessagesIDs[i] %><%= theMessages[i].state %></div> -->
+                            <h4><%= theMessages[i].name %></h4>
+                            <p><%= theMessages[i].message %></p>
+                            <p style="text-align: right;"><%= theMessages[i].dateTime %></p>
+                    </div>
+                    <% } else { %>
+                        <div id="<%= theMessagesIDs[i] %>" style="background-color: #99ffbb; display: block;">
+                            <!-- <div class="state" hidden><%= theMessagesIDs[i] %><%= theMessages[i].state %></div> -->
+                                <h4><%= theMessages[i].name %></h4>
+                                <p><%= theMessages[i].message %></p>
+                            <p style="text-align: right;"><%= theMessages[i].dateTime %></p>
+                        </div>
+                    <% } %>
+
+                <% } else { %>
+                    <% if(theMessages[i].state == 'hidden') { %>
+                    <div id="<%= theMessagesIDs[i] %>" style="background-color: #ffffb3; display: none;">
+                        <!-- <div class="state" hidden><%= theMessagesIDs[i] %><%= theMessages[i].state %></div> -->
+                            <h4 style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].name %></h4>
+                            <p style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].message %></p>
+                            <p style="color: <%= theMessages[i].textColor %>; text-align: right;"><%= theMessages[i].dateTime %></p>
+                    </div>
+                    <% } else { %>
+                        <div id="<%= theMessagesIDs[i] %>" style="background-color: #ffffb3; display: block;">
+                            <!-- <div class="state" hidden><%= theMessagesIDs[i] %><%= theMessages[i].state %></div> -->
+                                <h4 style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].name %></h4>
+                                <p style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].message %></p>
+                                <p style="color: <%= theMessages[i].textColor %>; text-align: right;"><%= theMessages[i].dateTime %></p>
+                        </div>
+                    <% } %>
+                <% } %>
+            <% } %>
+
+        </div>
+    </div>
+    <% } else{ %>
+        <div id="messagesInstructor<%= MessageID %>">
+            <% for(var i = 0; i < theMessages.length - 2; i++) { %>
+                <div id="Instructor<%= theMessagesIDs[i] %>" style="background-color: <%= theMessages[i].backgroundTextColor %>;">
+                    <!-- If message is not by instructor (it is student), have the reply button there -->
+                        <% if(theMessages[i].owner == 'Student') { %>
+                            <% if(theMessages[i].state == 'hidden') { %>
+                                    <button id="replyOpenFormBtn<%= theMessagesIDs[i] %>" onclick="reply_click(this.id)" type="button" class="btn btn-link" style="float: right; font-size: large; font-weight: bold; display: block;">Reply</button>
+                                <% } else { %>
+                                    <button id="replyOpenFormBtn<%= theMessagesIDs[i] %>" onclick="reply_click(this.id)" type="button" class="btn btn-link" style="float: right; font-size: large; font-weight: bold; display: none;">Reply</button>
+                                <% } %>
+                        <% } %>
+                    <% if(theMessages[i].state != 'visible') { %>
+                            <% if(MsgIDOfrepliesArray.length > 0) { %>
+                                    <% for(var a = 0; a < MsgIDOfrepliesArray.length; a++) { %>
+                                            <% if(MsgIDOfrepliesArray[a] == theMessagesIDs[i]) { %>
+                                                <a href="/<%= MessageID %>/instructor/<%= theMessagesIDs[i] %>/broadcast" id="broadcastLinkBtn<%= theMessagesIDs[i] %>" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold; display: none;">Broadcast</a>
+                                                <% break %>
+                                            <% } else { %>
+                                                <% if((a + 1) == MsgIDOfrepliesArray.length) { %>
+                                                    <a href="/<%= MessageID %>/instructor/<%= theMessagesIDs[i] %>/broadcast" id="broadcastLinkBtn<%= theMessagesIDs[i] %>" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold; display: block;">Broadcast</a>
+                                                <% } %>
+                                            <% } %>
+                                    <% } %>
+                            <% } else { %>
+                        <a href="/<%= MessageID %>/instructor/<%= theMessagesIDs[i] %>/broadcast" id="broadcastLinkBtn<%= theMessagesIDs[i] %>" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold; display: block;">Broadcast</a>
+                        <% } %>
+
+                    <% } else { %>
+                    <a href="/<%= MessageID %>/instructor/<%= theMessagesIDs[i] %>/hide" id="hideLinkBtn<%= theMessagesIDs[i] %>" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Hide</a>
+                    <% } %>
+                    <h4 style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].name %></h4>
+                <p style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].message %></p>
+                <p style="color: <%= theMessages[i].textColor %>; text-align: right;"><%= theMessages[i].dateTime %></p>
+                </div>
+                    <div id="RepliesAtInstructor<%= theMessagesIDs[i] %>">
+                        <% for(var a = 0; a < MsgIDOfrepliesArray.length; a++) { %>
+                            <% if(MsgIDOfrepliesArray[a] == theMessagesIDs[i]) { %>
+                                <!-- <div id="RepliesByInstructor<%= repliesIDArray[a] %>" style="background-color: <%= repliesArray[a].backgroundTextColor %>;"> -->
+                                    <div id="RepliesByInstructor<%= repliesIDArray[a] %>">
+                                    <!-- <a href="/<%= MessageID %>/instructor/<%= theMessagesIDs[i] %>/<%= repliesIDArray[a] %>/hideReply" id="hideLinkBtn<%= theMessagesIDs[i] %>" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Hide</a> -->
+                                    <h4 style="color: <%= repliesArray[a].textColor %>;"><%= repliesArray[a].name %></h4>
+                                    <p style="color: <%= repliesArray[a].textColor %>;"><%= repliesArray[a].message %></p>
+                                    <p style="color: <%= repliesArray[a].textColor %>; text-align: right;"><%= repliesArray[a].dateTime %></p>
+                                </div>
+                            <% } %>
+                        <% } %>
+                    </div>
+                <form method="POST" action="/<%= MessageID %>/instructor/<%= theMessagesIDs[i] %>/reply">
+                    <div class="jumbotron privateReply" id="replyForm<%= theMessagesIDs[i] %>" style="display: none;">
+                        <button id="replyCloseFormBtn<%= theMessagesIDs[i] %>" onclick="replyFormClose_Click(this.id)" class="btn btn-danger" style="float: right;" type="button"><i class="fas fa-times"></i></button>
+                        <h1 class="display-4">Private Reply</h1>
+                        <br/>
+                        <input id="replyName" name="replyName" class="form-control" placeholder="Name" required>
+                        <br>
+                        <textarea id="replyMessage" name="replyMessage" class="form-control" placeholder="Your Message Here" required></textarea>
+                        <br>
+                        <button id="replyBtn" type="submit" class="btn btn-success">Reply</button>
+                    </div>
+                </form>
+            <% } %>
+        </div>
+    <% } %>
+</div>
+
+<% if(isInstructor == 'true') { %>
+<br/>
+        <form method="POST" action="/<%= MessageID %>/instructor">
+            <div class="jumbotron">
+                <h1 class="display-4">Broadcast Messages</h1>
+                <br>
+                <input id="name" name="name" class="form-control" placeholder="Name" required>
                 <br>
                 <textarea id="message" name="message" class="form-control" placeholder="Your Message Here" required></textarea>
                 <br>
@@ -50,70 +189,38 @@
             </div>
             </form>
 
-    <% } %>
-
-    <% if(isInstructor == 'false') { %>
-        <div style="width: 45%; float: left;" id="MyMessage">
-            <h3 style="text-decoration: underline;">My Message</h3>
-
-        </div>
-    <div style="width: 50%; float: right;" id="messagesStudent<%= MessageID %>">
-        <h3 style="text-decoration: underline;">Broadcast</h3>
-        <% for(var i = 0; i < theMessages.length - 2; i++) { %>
-            <% if(theMessages[i].owner == 'Student') { %>
-                <% if(theMessages[i].state == 'hidden') { %>
-                <div id="<%= theMessagesIDs[i] %>" style="background-color: #99ffbb; display: none;">
-                    <!-- <div class="state" hidden><%= theMessagesIDs[i] %><%= theMessages[i].state %></div> -->
-                        <h4><%= theMessages[i].name %></h4>
-                        <p><%= theMessages[i].message %></p>
-                </div>
-                <% } else { %>
-                    <div id="<%= theMessagesIDs[i] %>" style="background-color: #99ffbb; display: block;">
-                        <!-- <div class="state" hidden><%= theMessagesIDs[i] %><%= theMessages[i].state %></div> -->
-                            <h4><%= theMessages[i].name %></h4>
-                            <p><%= theMessages[i].message %></p>
-                    </div>
-                <% } %>
-
-            <% } else { %>
-                <% if(theMessages[i].state == 'hidden') { %>
-                <div id="<%= theMessagesIDs[i] %>" style="background-color: #ffffb3; display: none;">
-                    <!-- <div class="state" hidden><%= theMessagesIDs[i] %><%= theMessages[i].state %></div> -->
-                        <h4 style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].name %></h4>
-                        <p style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].message %></p>
-                </div>
-                <% } else { %>
-                    <div id="<%= theMessagesIDs[i] %>" style="background-color: #ffffb3; display: block;">
-                        <!-- <div class="state" hidden><%= theMessagesIDs[i] %><%= theMessages[i].state %></div> -->
-                            <h4 style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].name %></h4>
-                            <p style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].message %></p>
-                    </div>
-                <% } %>    
-            <% } %>
-        <% } %>
-
+<% } else { %>
+    <br/>
+    <br/>
+    <br/>
+    <div style="clear: both;">
+    <form method="POST" action="/<%= MessageID %>">
+    <div class="jumbotron">
+        <h1 class="display-4">Send Message</h1>
+        <br>
+        <input id="name" name="name" class="form-control" placeholder="Name (Module Group)" required>
+        <br>
+        <textarea id="message" name="message" class="form-control" placeholder="Your Message Here" required></textarea>
+        <br>
+        <button id="send" type="submit" class="btn btn-success">Send</button>
     </div>
-    <% } else{ %>
-        <div id="messagesInstructor<%= MessageID %>">
-            <% for(var i = 0; i < theMessages.length - 2; i++) { %>
-                <div id="Instructor<%= theMessagesIDs[i] %>" style="background-color: <%= theMessages[i].backgroundTextColor %>;">
-                        <a href="/<%= MessageID %>/instructor/<%= theMessagesIDs[i] %>/reply" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Reply</a>
-                    <% if(theMessages[i].state != 'visible') { %>
-                    <a href="/<%= MessageID %>/instructor/<%= theMessagesIDs[i] %>/broadcast" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Broadcast</a>
-                    <% } else { %>
-                    <a href="/<%= MessageID %>/instructor/<%= theMessagesIDs[i] %>/hide" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Hide</a>
-                    <% } %>
-                    <h4 style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].name %></h4>
-                <p style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].message %></p>
-                </div>
-            <% } %>
-        </div>
-    <% } %>
+    </form>
 </div>
+<% } %>
+
 <% if(isInstructor == 'false') { %>
     <div id="PendingMessagesDivID" hidden>
         <p id="PendingMessageName"><%= OwnMessageName %></p>
         <p id="PendingMessage"><%= OwnMessage %></p>
+        <p id="PendingMessageID"><%= OwnMessageID %></p>
+        <p id="PendingMessageDateTime"><%= OwnMessageDateTime %></p>
+            <% for(var a = 0; a < MsgIDOfrepliesArray.length; a++) { %>
+                <p id="PendingRepliesMsgID<%= [a] %>" class="msgIDofreplies"><%= MsgIDOfrepliesArray[a] %></p>
+                <p id="PendingRepliesName<%= [a] %>"><%= repliesArray[a].name %></p>
+                <p id="PendingRepliesMessage<%= [a] %>"><%= repliesArray[a].message %></p>
+                <p id="PendingRepliesID<%= [a] %>"><%= repliesIDArray[a] %></p>
+                <p id="PendingRepliesDateTime<%= [a] %>"><%= repliesArray[a].dateTime %></p>
+            <% } %>
     </div>
 <% } %>
 
@@ -163,10 +270,14 @@
         var storedHasSth = 0;
         var myMessageName = document.getElementById("PendingMessageName").innerHTML;
         var myMessage = document.getElementById("PendingMessage").innerHTML;
+        var myMessageID = document.getElementById("PendingMessageID").innerHTML;
+        var myMessageDateTime = document.getElementById("PendingMessageDateTime").innerHTML;
         // var myMessageCurrentState = document.getElementById("PendingMessageCurrentState").innerHTML;
 
         var myMessageNameStored = JSON.parse(sessionStorage.getItem("OwnMessageName"));
         var myMessageStored = JSON.parse(sessionStorage.getItem("OwnMessage"));
+        var myMessageIDStored = JSON.parse(sessionStorage.getItem("OwnMessageID"));
+        var myMessageDateTimeStored = JSON.parse(sessionStorage.getItem("OwnMessageDateTime"));
         // var myMessageCurrentStateStored = JSON.parse(sessionStorage.getItem("OwnMessageCurrentState"));
 
         if(myMessageNameStored == null || myMessageNameStored == ""){
@@ -175,52 +286,102 @@
         else{
             storedHasSth = 1;
         }
-        
+
         if(storedHasSth == 0){
             var MessageNameToAdd = [];
             var MessageToAdd = [];
+            var MessageIDToAdd = [];
+            var MessageDateTimeToAdd = [];
             // var MessageCurrentStateToAdd = [];
 
             MessageNameToAdd.push(myMessageName);
             MessageToAdd.push(myMessage);
+            MessageIDToAdd.push(myMessageID);
+            MessageDateTimeToAdd.push(myMessageDateTime);
             // MessageCurrentStateToAdd.push(myMessageCurrentState);
 
             window.sessionStorage.setItem("OwnMessageName", JSON.stringify(MessageNameToAdd))
             window.sessionStorage.setItem("OwnMessage", JSON.stringify(MessageToAdd))
+            window.sessionStorage.setItem("OwnMessageID", JSON.stringify(MessageIDToAdd))
+            window.sessionStorage.setItem("OwnMessageDateTime", JSON.stringify(MessageDateTimeToAdd))
             // window.sessionStorage.setItem("OwnMessageCurrentState", JSON.stringify(MessageCurrentStateToAdd))
         }
         else{
             var MessageNameToAdd = [];
             var MessageToAdd = [];
+            var MessageIDToAdd = [];
+            var MessageDateTimeToAdd = [];
             // var MessageCurrentStateToAdd = [];
 
             for(i = 0; i < myMessageNameStored.length; i++){
                 MessageNameToAdd.push(myMessageNameStored[i]);
                 MessageToAdd.push(myMessageStored[i]);
+                MessageIDToAdd.push(myMessageIDStored[i]);
+                MessageDateTimeToAdd.push(myMessageDateTimeStored[i]);
                 // MessageCurrentStateToAdd.push(myMessageCurrentStateStored[i]);
             }
             MessageNameToAdd.push(myMessageName);
             MessageToAdd.push(myMessage);
+            MessageIDToAdd.push(myMessageID);
+            MessageDateTimeToAdd.push(myMessageDateTime);
             // MessageCurrentStateToAdd.push(myMessageCurrentState);
 
             window.sessionStorage.setItem("OwnMessageName", JSON.stringify(MessageNameToAdd))
             window.sessionStorage.setItem("OwnMessage", JSON.stringify(MessageToAdd))
+            window.sessionStorage.setItem("OwnMessageID", JSON.stringify(MessageIDToAdd))
+            window.sessionStorage.setItem("OwnMessageDateTime", JSON.stringify(MessageDateTimeToAdd))
             // window.sessionStorage.setItem("OwnMessageCurrentState", JSON.stringify(MessageCurrentStateToAdd))
         }
 
         myMessageNameStored = JSON.parse(sessionStorage.getItem("OwnMessageName"));
         myMessageStored = JSON.parse(sessionStorage.getItem("OwnMessage"));
+        myMessageIDStored = JSON.parse(sessionStorage.getItem("OwnMessageID"));
+        myMessageDateTimeStored = JSON.parse(sessionStorage.getItem("OwnMessageDateTime"));
         // myMessageCurrentStateStored = JSON.parse(sessionStorage.getItem("OwnMessageCurrentState"));
-       
-        for(m = 0; m < myMessageNameStored.length; m++){
-            if(myMessageNameStored[m] != ""){
-                $("#MyMessage").append(`<div style="background-color: #b3b3b3">
-                <h4 style="color: black;">${myMessageNameStored[m]}</h4>
-                <p style="color: black;">${myMessageStored[m]}</p>
-                </div>`)
-            }
-        }
 
+        var PendingRepliesMsgID = [];
+        var PendingRepliesName = [];
+        var PendingRepliesMessage = [];
+        var PendingRepliesID = [];
+        var PendingRepliesDateTime = [];
+        
+        var noOfmsgIDofreplies = $('.msgIDofreplies').length;
+        var msgIDofrepliesIndex = 0;
+            if(noOfmsgIDofreplies != 0){
+                do {
+                    PendingRepliesMsgID.push(document.getElementById("PendingRepliesMsgID" + msgIDofrepliesIndex).innerHTML);
+                    PendingRepliesName.push(document.getElementById("PendingRepliesName" + msgIDofrepliesIndex).innerHTML);
+                    PendingRepliesMessage.push(document.getElementById("PendingRepliesMessage" + msgIDofrepliesIndex).innerHTML);
+                    PendingRepliesID.push(document.getElementById("PendingRepliesID" + msgIDofrepliesIndex).innerHTML);
+                    PendingRepliesDateTime.push(document.getElementById("PendingRepliesDateTime" + msgIDofrepliesIndex).innerHTML);
+                    msgIDofrepliesIndex++;
+                } while (msgIDofrepliesIndex < noOfmsgIDofreplies);
+            }
+
+            for(m = 0; m < myMessageNameStored.length; m++){
+                if(myMessageNameStored[m] != ""){
+                    $("#MyMessage").append(`<div id="OwnMessageID${myMessageIDStored[m]}" style="background-color: #b3b3b3">
+                    <h4 style="color: black;">${myMessageNameStored[m]}</h4>
+                    <p style="color: black;">${myMessageStored[m]}</p>
+                    <p style="color: black; text-align:right;">${myMessageDateTimeStored[m]}</p>
+                    </div> 
+                    <div id="RepliesAtStudent${myMessageIDStored[m]}">
+                    </div>`)
+
+                    for(r = 0; r < PendingRepliesMsgID.length; r++){
+                        if(PendingRepliesMsgID[r] == myMessageIDStored[m]){
+                            $("#RepliesAtStudent" + PendingRepliesMsgID[r]).append(`<div id="RepliesToStudent${PendingRepliesID[r]}">
+                                                        <h4 style="color: blue;">${PendingRepliesName[r]}</h4>
+                                                        <p style="color: blue;">${PendingRepliesMessage[r]}</p>
+                                                        <p style="color: blue; text-align: right;">${PendingRepliesDateTime[r]}</p>
+                                                    </div>`)
+                        }
+                    }
+                
+                }
+            }
+
+        
             
     })
 
@@ -228,39 +389,52 @@
     socket.on('messageHide', hideMessages)
     socket.on('messageBroadcast', BroadcastMessages)
     socket.on('messageClear', ClearMessages)
+    socket.on('repliesAdded', repliesAdded)
 
     function addMessages(message){
             if(message.owner == "Instructor"){
-                $("#messagesStudent" + message.chatID).append(`<div id="${message.theMsgID}" style="background-color: ${message.backgroundTextColor};"> 
+                $("#messagesStudent" + message.chatID).append(`<div id="${message.theMsgID}" style="background-color: ${message.backgroundTextColor};">
                 <h4 style="color: ${message.textColor};"> ${message.name} </h4>
                 <p style="color: ${message.textColor};"> ${message.message} </p>
+                <p style="color: ${message.textColor}; text-align: right;">${message.dateTime}</p>
                 </div>`)
 
                 $("#messagesInstructor" + message.chatID).append(`<div id="Instructor${message.theMsgID}" style="background-color: ${message.backgroundTextColor};">
                     <a href="/${message.chatID}/instructor/${message.theMsgID}/hide" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Hide</a>
                     <h4 style="color: ${message.textColor};">${message.name}</h4>
                 <p style="color: ${message.textColor};">${message.message}</p>
+                <p style="color: ${message.textColor}; text-align: right;">${message.dateTime}</p>
                 </div>`)
             }
             else{
                 $("#messagesStudent" + message.chatID).append(`<div id="${message.theMsgID}" style="background-color: #99ffbb; display: none">
                 <h4> ${message.name} </h4>
                 <p> ${message.message} </p>
+                <p style="text-align: right;">${message.dateTime}</p>
                 </div>`)
                 // $("#" + message.theMsgID).hide();
 
                 $("#messagesInstructor" + message.chatID).append(`<div id="Instructor${message.theMsgID}" style="background-color: ${message.backgroundTextColor};">
-                    <a href="/${message.chatID}/instructor/${message.theMsgID}/broadcast" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Broadcast</a>
+                    <button id="replyOpenFormBtn${message.theMsgID}" onclick="reply_click(this.id)" type="button" class="btn btn-link" style="float: right; font-size: large; font-weight: bold; display: block;">Reply</button>
+                    <a href="/${message.chatID}/instructor/${message.theMsgID}/broadcast" id="broadcastLinkBtn${message.theMsgID}" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Broadcast</a>
                     <h4 style="color: ${message.textColor};">${message.name}</h4>
                 <p style="color: ${message.textColor};">${message.message}</p>
-                </div>`)
+                <p style="color: ${message.textColor}; text-align: right;">${message.dateTime}</p>
+            </div>
+                <div id="RepliesAtInstructor${message.theMsgID}"></div>
+                <form method="POST" action="/${message.chatID}/instructor/${message.theMsgID}/reply">
+                    <div class="jumbotron privateReply" id="replyForm${message.theMsgID}" style="display: none;">
+                        <button id="replyCloseFormBtn${message.theMsgID}" onclick="replyFormClose_Click(this.id)" class="btn btn-danger" style="float: right;" type="button"><i class="fas fa-times"></i></button>
+                        <h1 class="display-4">Private Reply</h1>
+                        <br/>
+                        <input id="replyName" name="replyName" class="form-control" placeholder="Name (Module Group)" required>
+                        <br>
+                        <textarea id="replyMessage" name="replyMessage" class="form-control" placeholder="Your Message Here" required></textarea>
+                        <br>
+                        <button id="replyBtn" type="submit" class="btn btn-success">Reply</button>
+                    </div>
+                </form>`)
             }
-
-        // $("#messagesInstructor" + message.chatID).append(`<div id="Instructor${message.theMsgID}" style="background-color: ${message.backgroundTextColor};">
-        //             <a href="/${message.chatID}/instructor/${message.theMsgID}/hide" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Hide</a>
-        //             <h4 style="color: ${message.textColor};">${message.name}</h4>
-        //         <p style="color: ${message.textColor};">${message.message}</p>
-        //         </div>`)
     }
     function hideMessages(hiddenMsg){
         // $("#" + hiddenMsg.theMsgID).hide();
@@ -269,8 +443,11 @@
         var str = document.getElementById("Instructor" + hiddenMsg.theMsgID).innerHTML;
         str = str.replace("Hide", "Broadcast")
         str = str.replace("/hide", "/broadcast")
+        str = str.replace("hideLinkBtn", "broadcastLinkBtn")
         // str = str.replace("/" + hiddenMsg.chatID + "/instructor/" + hiddenMsg.chatID + "/hide", "/" + hiddenMsg.chatID + "/instructor/" + hiddenMsg.chatID + "/unhide")
         $("#Instructor" + hiddenMsg.theMsgID).html(str);
+
+        $("#replyOpenFormBtn" + hiddenMsg.theMsgID).css({"display": "block"});
     }
     function BroadcastMessages(hiddenMsg){
         // $("#" + hiddenMsg.theMsgID).show();
@@ -284,8 +461,12 @@
         var str = document.getElementById("Instructor" + hiddenMsg.theMsgID).innerHTML;
         str = str.replace("Broadcast", "Hide")
         str = str.replace("/broadcast", "/hide")
+        str = str.replace("broadcastLinkBtn", "hideLinkBtn")
         // str = str.replace("/" + hiddenMsg.chatID + "/instructor/" + hiddenMsg.chatID + "/unhide", "/" + hiddenMsg.chatID + "/instructor/" + hiddenMsg.chatID + "/hide")
         $("#Instructor" + hiddenMsg.theMsgID).html(str);
+
+        $("#replyOpenFormBtn" + hiddenMsg.theMsgID).css({"display": "none"});
+
     }
     function ClearMessages(theChatID){
         $("#messagesStudent" + theChatID).html('<h3 style="text-decoration: underline;">Broadcast</h3>');
@@ -300,6 +481,32 @@
         $('#exampleModal').modal('hide');
         $("#clearMessagesBtnID").click()
     });
+
+    function reply_click(replyOpenFormBtnID){
+        var MsgIDOfreplyOpenFormBtn = replyOpenFormBtnID.substring(16)
+        $("#replyForm" + MsgIDOfreplyOpenFormBtn).css({"display": "block"});
+    }
+
+    function replyFormClose_Click(replyCloseFormBtnID){
+        var MsgIDOfreplyCloseFormBtn = replyCloseFormBtnID.substring(17)
+        $("#replyForm" + MsgIDOfreplyCloseFormBtn).css({"display": "none"});
+    }
+
+    function repliesAdded(theReply){
+        $("#broadcastLinkBtn" + theReply.theMsgID).css({"display": "none"});
+        $("#RepliesAtInstructor" + theReply.theMsgID).append(`<div id="RepliesByInstructor${theReply.replyID}">
+                                                    <h4 style="color: ${theReply.textColor};">${theReply.replyName}</h4>
+                                                    <p style="color: ${theReply.textColor};">${theReply.replyMessage}</p>
+                                                </div>`)
+        //display replies first then do the io to append the replies
+        $("#RepliesAtStudent" + theReply.theMsgID).append(`<div id="RepliesToStudent${theReply.replyID}">
+                                                    <h4 style="color: ${theReply.textColor};">${theReply.replyName}</h4>
+                                                    <p style="color: ${theReply.textColor};">${theReply.replyMessage}</p>
+                                                    <p style="color: ${theReply.textColor}; text-align: right;">${theReply.dateTime}</p>
+                                                </div>`)
+
+    }
+
 </script>
 </body>
 </html>
