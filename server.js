@@ -68,7 +68,7 @@ app.get('/createChat', (req, res) => {
     const message_id = messageRef.push().key;
     messageRef.child(message_id).set({
       name: '',
-      dateTime: d.toLocaleString('en-US', options)
+      dateTime: d.toLocaleString('en-GB', options)
     });
     req.body.chatID = message_id
     res.redirect(`/${message_id}`);
@@ -143,7 +143,7 @@ app.get('/:id', (req, res) => {
             if(haveUpperCase == 1 && haveLowerCase == 1 && have16Characters == 1){
               messageRef.child(req.params.id).set({
                 name: '',
-                dateTime: d.toLocaleString('en-US', options)
+                dateTime: d.toLocaleString('en-GB', options)
               });
               req.flash('success_msg', 'Chat Room ' + req.params.id + ' entered');
               req.body.chatID = req.params.id
@@ -174,14 +174,14 @@ app.post('/:id', async (req, res) => {
             backgroundTextColor: '#b3b3b3',
             owner: 'Student',
             state: 'hidden',
-            dateTime: d.toLocaleString('en-US', options)
+            dateTime: d.toLocaleString('en-GB', options)
         });
         req.body.textColor = '#000000';
         req.body.backgroundTextColor = '#b3b3b3';
         req.body.owner = 'Student';
         req.body.state = 'hidden';
         req.body.chatID = req.params.id;
-        req.body.dateTime = d.toLocaleString('en-US', options)
+        req.body.dateTime = d.toLocaleString('en-GB', options)
 
         var dataArray = [];
         messageRef.child(req.params.id).once("value", function(snapshot) {
@@ -302,7 +302,7 @@ app.get('/:id/instructor', (req, res) => {
           if(haveUpperCase == 1 && haveLowerCase == 1 && have16Characters == 1){
             messageRef.child(req.params.id).set({
               name: '',
-              dateTime: d.toLocaleString('en-US', options)
+              dateTime: d.toLocaleString('en-GB', options)
             });
             // req.flash('success_msg', 'Chat Room ' + req.params.id + ' entered as instructor');
             res.redirect(`/${req.params.id}/instructor`);
@@ -331,13 +331,13 @@ app.post('/:id/instructor', async (req, res) => {
             backgroundTextColor: '#ffffb3',
             owner: 'Instructor',
             state: 'visible',
-            dateTime: d.toLocaleString('en-US', options)
+            dateTime: d.toLocaleString('en-GB', options)
           });
         req.body.textColor = 'blue';
         req.body.backgroundTextColor = '#ffffb3';
         req.body.owner = 'Instructor';
         req.body.state = 'visible';
-        req.body.dateTime = d.toLocaleString('en-US', options)
+        req.body.dateTime = d.toLocaleString('en-GB', options)
 
         var dataArray = [];
         messageRef.child(req.params.id).once("value", function(snapshot) {
@@ -581,7 +581,7 @@ app.get('/admin/infinity', async (req, res) => {
   //         for(x = 0; x < list.length; x++){
   //           var result = new Date(list[x].LastMsgDateTime);
   //           result.setDate(result.getDate() + 28);
-  //           // result = result.toLocaleString('en-US', options);
+  //           // result = result.toLocaleString('en-GB', options);
   //           // console.log(result);
   //           // console.log(d)
   //           if(result < d){
@@ -649,7 +649,7 @@ app.get('/admin/infinity', async (req, res) => {
           for(x = 0; x < list.length; x++){
             var result = new Date(list[x].ChatRmCreationDateTime);
             result.setDate(result.getDate() + 28);
-            // result = result.toLocaleString('en-US', options);
+            // result = result.toLocaleString('en-GB', options);
             // console.log(result);
             // console.log(d)
             if(result < d){
@@ -675,13 +675,13 @@ app.get('/admin/infinity', async (req, res) => {
           backgroundTextColor: '#ffffb3',
           owner: 'Instructor',
           state: 'visible',
-          dateTime: d.toLocaleString('en-US', options)
+          dateTime: d.toLocaleString('en-GB', options)
       });
 
       req.body.replyID = (await newReply).key;
       req.body.theMsgID = req.params.theMsgID;
       req.body.textColor = 'blue';
-      req.body.dateTime = d.toLocaleString('en-US', options);
+      req.body.dateTime = d.toLocaleString('en-GB', options);
 
       res.redirect(`/${req.params.id}/instructor`);
       io.emit('repliesAdded', req.body);
