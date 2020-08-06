@@ -61,14 +61,39 @@ app.get('/', (req, res) => {
     res.render('homepage');
 })
 
+function getMonthText(monthNum){
+    var month = new Array();
+    month[0] = "January";
+    month[1] = "February";
+    month[2] = "March";
+    month[3] = "April";
+    month[4] = "May";
+    month[5] = "June";
+    month[6] = "July";
+    month[7] = "August";
+    month[8] = "September";
+    month[9] = "October";
+    month[10] = "November";
+    month[11] = "December";
+
+    return month[monthNum]
+}
+
 app.get('/createChat', (req, res) => {
     var d = new Date();
     var options = { hour12: false };
 
+    var date = d.toLocaleDateString();
+    var MonthText = getMonthText((date.substring(0,1) - 1));
+    var day = date.substring(2, 3);
+    var Time = d.toLocaleTimeString('en-GB', options);
+
+    // console.log(day + ' ' + MonthText + ' ' + d.getFullYear() + ', ' + Time);
+
     const message_id = messageRef.push().key;
     messageRef.child(message_id).set({
       name: '',
-      dateTime: d.toLocaleString('en-GB', options)
+      dateTime: day + ' ' + MonthText + ' ' + d.getFullYear() + ', ' + Time
     });
     req.body.chatID = message_id
     res.redirect(`/${message_id}`);
@@ -78,6 +103,11 @@ app.get('/createChat', (req, res) => {
 app.get('/:id', (req, res) => {
     var d = new Date();
     var options = { hour12: false };
+
+    var date = d.toLocaleDateString();
+    var MonthText = getMonthText((date.substring(0,1) - 1));
+    var day = date.substring(2, 3);
+    var Time = d.toLocaleTimeString('en-GB', options);
 
       var messageArray = [];
       var messageIDArray = [];
@@ -143,7 +173,7 @@ app.get('/:id', (req, res) => {
             if(haveUpperCase == 1 && haveLowerCase == 1 && have16Characters == 1){
               messageRef.child(req.params.id).set({
                 name: '',
-                dateTime: d.toLocaleString('en-GB', options)
+                dateTime: day + ' ' + MonthText + ' ' + d.getFullYear() + ', ' + Time
               });
               req.flash('success_msg', 'Chat Room ' + req.params.id + ' entered');
               req.body.chatID = req.params.id
@@ -167,6 +197,11 @@ app.post('/:id', async (req, res) => {
     var d = new Date();
     var options = { hour12: false };
 
+    var date = d.toLocaleDateString();
+    var MonthText = getMonthText((date.substring(0,1) - 1));
+    var day = date.substring(2, 3);
+    var Time = d.toLocaleTimeString('en-GB', options);
+
     messageRef.child(req.params.id).push({
             name: req.body.name,
             message: req.body.message,
@@ -174,14 +209,14 @@ app.post('/:id', async (req, res) => {
             backgroundTextColor: '#b3b3b3',
             owner: 'Student',
             state: 'hidden',
-            dateTime: d.toLocaleString('en-GB', options)
+            dateTime: day + ' ' + MonthText + ' ' + d.getFullYear() + ', ' + Time
         });
         req.body.textColor = '#000000';
         req.body.backgroundTextColor = '#b3b3b3';
         req.body.owner = 'Student';
         req.body.state = 'hidden';
         req.body.chatID = req.params.id;
-        req.body.dateTime = d.toLocaleString('en-GB', options)
+        req.body.dateTime = day + ' ' + MonthText + ' ' + d.getFullYear() + ', ' + Time
 
         var dataArray = [];
         messageRef.child(req.params.id).once("value", function(snapshot) {
@@ -238,6 +273,12 @@ app.post('/:id', async (req, res) => {
 app.get('/:id/instructor', (req, res) => {
     var d = new Date();
     var options = { hour12: false };
+
+    var date = d.toLocaleDateString();
+    var MonthText = getMonthText((date.substring(0,1) - 1));
+    var day = date.substring(2, 3);
+    var Time = d.toLocaleTimeString('en-GB', options);
+
 
     var messageArray = [];
     var messageIDArray = [];
@@ -302,7 +343,7 @@ app.get('/:id/instructor', (req, res) => {
           if(haveUpperCase == 1 && haveLowerCase == 1 && have16Characters == 1){
             messageRef.child(req.params.id).set({
               name: '',
-              dateTime: d.toLocaleString('en-GB', options)
+              dateTime: day + ' ' + MonthText + ' ' + d.getFullYear() + ', ' + Time
             });
             // req.flash('success_msg', 'Chat Room ' + req.params.id + ' entered as instructor');
             res.redirect(`/${req.params.id}/instructor`);
@@ -324,6 +365,11 @@ app.post('/:id/instructor', async (req, res) => {
     var d = new Date();
     var options = { hour12: false };
 
+    var date = d.toLocaleDateString();
+    var MonthText = getMonthText((date.substring(0,1) - 1));
+    var day = date.substring(2, 3);
+    var Time = d.toLocaleTimeString('en-GB', options);
+
     messageRef.child(req.params.id).push({
             name: req.body.name,
             message: req.body.message,
@@ -331,13 +377,13 @@ app.post('/:id/instructor', async (req, res) => {
             backgroundTextColor: '#ffffb3',
             owner: 'Instructor',
             state: 'visible',
-            dateTime: d.toLocaleString('en-GB', options)
+            dateTime: day + ' ' + MonthText + ' ' + d.getFullYear() + ', ' + Time
           });
         req.body.textColor = 'blue';
         req.body.backgroundTextColor = '#ffffb3';
         req.body.owner = 'Instructor';
         req.body.state = 'visible';
-        req.body.dateTime = d.toLocaleString('en-GB', options)
+        req.body.dateTime = day + ' ' + MonthText + ' ' + d.getFullYear() + ', ' + Time
 
         var dataArray = [];
         messageRef.child(req.params.id).once("value", function(snapshot) {
@@ -518,8 +564,15 @@ app.get('/admin/infinity', async (req, res) => {
           for (var j = 0; j < ChatRmIDArray.length; j++) 
           list.push({'ChatRmID': ChatRmIDArray[j], 'LastMsgDateTime': DateTimeOfLastMsgInEachChatRmArray[j]});
           list.sort(function(a, b) {
-            return ((a.LastMsgDateTime < b.LastMsgDateTime) ? -1 : ((a.LastMsgDateTime == b.LastMsgDateTime) ? 0 : 1));
-          });
+              date1 = new Date(a.LastMsgDateTime);
+              date2 = new Date(b.LastMsgDateTime);
+              if (date1 > date2) return 1;
+              if (date1 < date2) return -1;
+            })
+
+          // list.sort(function(a, b) {
+          //     return ((a.LastMsgDateTime < b.LastMsgDateTime) ? -1 : ((a.LastMsgDateTime > b.LastMsgDateTime) ? 1 : 0));
+          // });
 
           for (var k = 0; k < list.length; k++) {
             ChatRmIDArray[k] = list[k].ChatRmID;
@@ -624,19 +677,18 @@ app.get('/admin/infinity', async (req, res) => {
 
     var ChatRmIDToEmit = [];
 
-  messageRef.on("value", function(snapshot) {
-      snapshot.forEach((child) => {         
-              ChatRmIDArray.push(child.key)
-              DateTimeOfEachChatRmArray.push(child.val().dateTime);
-       });
-        }, function (errorObject) {
-          console.log("The read failed: " + errorObject.code);
+    messageRef.on("value", function(snapshot) {
+        snapshot.forEach((child) => {         
+                ChatRmIDArray.push(child.key)
+                DateTimeOfEachChatRmArray.push(child.val().dateTime);
         });
 
-        console.log(ChatRmIDArray)
-        console.log(DateTimeOfEachChatRmArray)
+          }, function (errorObject) {
+            console.log("The read failed: " + errorObject.code);
+          });
 
-
+          // console.log(ChatRmIDArray)
+          // console.log(DateTimeOfEachChatRmArray)
 
           var list = [];
           var d = new Date();
@@ -668,6 +720,11 @@ app.get('/admin/infinity', async (req, res) => {
     var d = new Date();
     var options = { hour12: false };
 
+    var date = d.toLocaleDateString();
+    var MonthText = getMonthText((date.substring(0,1) - 1));
+    var day = date.substring(2, 3);
+    var Time = d.toLocaleTimeString('en-GB', options);
+
     var newReply = messageRef.child(req.params.id).child(req.params.theMsgID).push({
           name: req.body.replyName,
           message: req.body.replyMessage,
@@ -675,13 +732,13 @@ app.get('/admin/infinity', async (req, res) => {
           backgroundTextColor: '#ffffb3',
           owner: 'Instructor',
           state: 'visible',
-          dateTime: d.toLocaleString('en-GB', options)
+          dateTime: day + ' ' + MonthText + ' ' + d.getFullYear() + ', ' + Time
       });
 
       req.body.replyID = (await newReply).key;
       req.body.theMsgID = req.params.theMsgID;
       req.body.textColor = 'blue';
-      req.body.dateTime = d.toLocaleString('en-GB', options);
+      req.body.dateTime = day + ' ' + MonthText + ' ' + d.getFullYear() + ', ' + Time;
 
       res.redirect(`/${req.params.id}/instructor`);
       io.emit('repliesAdded', req.body);
