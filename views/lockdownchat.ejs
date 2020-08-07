@@ -148,9 +148,12 @@
                     <div id="RepliesAtInstructor<%= theMessagesIDs[i] %>">
                         <% for(var a = 0; a < MsgIDOfrepliesArray.length; a++) { %>
                             <% if(MsgIDOfrepliesArray[a] == theMessagesIDs[i]) { %>
-                                <!-- <div id="RepliesByInstructor<%= repliesIDArray[a] %>" style="background-color: <%= repliesArray[a].backgroundTextColor %>;"> -->
-                                    <div id="RepliesByInstructor<%= repliesIDArray[a] %>">
-                                    <!-- <a href="/<%= MessageID %>/instructor/<%= theMessagesIDs[i] %>/<%= repliesIDArray[a] %>/hideReply" id="hideLinkBtn<%= theMessagesIDs[i] %>" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Hide</a> -->
+                                    <div id="RepliesByInstructor<%= repliesIDArray[a] %>" style="background-color: <%= repliesArray[a].backgroundTextColor %>;">
+                                        <% if(repliesArray[a].state == 'visible') { %>
+                                            <a href="/<%= MessageID %>/instructor/<%= theMessagesIDs[i] %>/<%= repliesIDArray[a] %>/hideReply" id="hideReplyLinkBtn<%= repliesIDArray[a] %>" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Hide Reply</a>
+                                            <% } else { %>
+                                            <a href="/<%= MessageID %>/instructor/<%= theMessagesIDs[i] %>/<%= repliesIDArray[a] %>/unhideReply" id="unhideReplyLinkBtn<%= repliesIDArray[a] %>" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Unhide Reply</a>
+                                            <% } %>
                                     <h4 style="color: <%= repliesArray[a].textColor %>;"><%= repliesArray[a].name %></h4>
                                     <p style="color: <%= repliesArray[a].textColor %>;"><%= repliesArray[a].message %></p>
                                     <p style="color: <%= repliesArray[a].textColor %>; text-align: right;"><%= repliesArray[a].dateTime %></p>
@@ -220,6 +223,7 @@
                 <p id="PendingRepliesMessage<%= [a] %>"><%= repliesArray[a].message %></p>
                 <p id="PendingRepliesID<%= [a] %>"><%= repliesIDArray[a] %></p>
                 <p id="PendingRepliesDateTime<%= [a] %>"><%= repliesArray[a].dateTime %></p>
+                <p id="PendingRepliesState<%= [a] %>"><%= repliesArray[a].state %></p>
             <% } %>
     </div>
 <% } %>
@@ -347,7 +351,8 @@
         var PendingRepliesMessage = [];
         var PendingRepliesID = [];
         var PendingRepliesDateTime = [];
-        
+        var PendingRepliesState = [];
+
         var noOfmsgIDofreplies = $('.msgIDofreplies').length;
         var msgIDofrepliesIndex = 0;
             if(noOfmsgIDofreplies != 0){
@@ -357,6 +362,7 @@
                     PendingRepliesMessage.push(document.getElementById("PendingRepliesMessage" + msgIDofrepliesIndex).innerHTML);
                     PendingRepliesID.push(document.getElementById("PendingRepliesID" + msgIDofrepliesIndex).innerHTML);
                     PendingRepliesDateTime.push(document.getElementById("PendingRepliesDateTime" + msgIDofrepliesIndex).innerHTML);
+                    PendingRepliesState.push(document.getElementById("PendingRepliesState" + msgIDofrepliesIndex).innerHTML);
                     msgIDofrepliesIndex++;
                 } while (msgIDofrepliesIndex < noOfmsgIDofreplies);
             }
@@ -378,6 +384,10 @@
                                                         <p style="color: blue;">${PendingRepliesMessage[r]}</p>
                                                         <p style="color: blue; text-align: right;">${PendingRepliesDateTime[r]}</p>
                                                     </div>`)
+                            
+                            if(PendingRepliesState[r] == 'hidden'){
+                                $("#RepliesToStudent" + PendingRepliesID[r]).css({"display": "none"});
+                            }
                         }
                     }
                 
@@ -393,7 +403,9 @@
     socket.on('messageBroadcast', BroadcastMessages)
     socket.on('messageClear', ClearMessages)
     socket.on('repliesAdded', repliesAdded)
-
+    socket.on('messageReplyHide', messageReplyHide)
+    socket.on('messageReplyUnhide', messageReplyUnhide)
+    
     function addMessages(message){
             if(message.owner == "Instructor"){
                 $("#messagesStudent" + message.chatID).append(`<div id="${message.theMsgID}" style="background-color: ${message.backgroundTextColor};">
@@ -498,8 +510,10 @@
     function repliesAdded(theReply){
         $("#broadcastLinkBtn" + theReply.theMsgID).css({"display": "none"});
         $("#RepliesAtInstructor" + theReply.theMsgID).append(`<div id="RepliesByInstructor${theReply.replyID}">
+            <a href="/${theReply.chatID}/instructor/${theReply.theMsgID}/${theReply.replyID}/hideReply" id="hideReplyLinkBtn${theReply.replyID}" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Hide Reply</a>
                                                     <h4 style="color: ${theReply.textColor};">${theReply.replyName}</h4>
                                                     <p style="color: ${theReply.textColor};">${theReply.replyMessage}</p>
+                                                    <p style="color: ${theReply.textColor}; text-align: right;">${theReply.dateTime}</p>
                                                 </div>`)
         //display replies first then do the io to append the replies
         $("#RepliesAtStudent" + theReply.theMsgID).append(`<div id="RepliesToStudent${theReply.replyID}">
@@ -510,6 +524,25 @@
 
     }
 
+    function messageReplyHide(replyMsg){
+        $("#RepliesToStudent" + replyMsg.replyID).css({"display": "none"});
+        $("#RepliesByInstructor" + replyMsg.replyID).css({"background-color": "#b3b3b3"});
+        var str = document.getElementById("RepliesByInstructor" + replyMsg.replyID).innerHTML;
+        str = str.replace("Hide Reply", "Unhide Reply")
+        str = str.replace("/hideReply", "/unhideReply")
+        str = str.replace("hideReplyLinkBtn", "unhideReplyLinkBtn")
+        $("#RepliesByInstructor" + replyMsg.replyID).html(str);
+    }
+
+    function messageReplyUnhide(replyMsg){
+        $("#RepliesToStudent" + replyMsg.replyID).css({"display": "block"});
+        $("#RepliesByInstructor" + replyMsg.replyID).css({"background-color": "white"});
+        var str = document.getElementById("RepliesByInstructor" + replyMsg.replyID).innerHTML;
+        str = str.replace("Unhide Reply", "Hide Reply")
+        str = str.replace("/unhideReply", "/hideReply")
+        str = str.replace("unhideReplyLinkBtn", "hideReplyLinkBtn")
+        $("#RepliesByInstructor" + replyMsg.replyID).html(str);
+    }
 </script>
 </body>
 </html>

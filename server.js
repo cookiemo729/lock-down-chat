@@ -729,12 +729,13 @@ app.get('/admin/infinity', async (req, res) => {
           name: req.body.replyName,
           message: req.body.replyMessage,
           textColor: 'blue',
-          backgroundTextColor: '#ffffb3',
+          backgroundTextColor: 'white',
           owner: 'Instructor',
           state: 'visible',
           dateTime: day + ' ' + MonthText + ' ' + d.getFullYear() + ', ' + Time
       });
-
+      
+      req.body.chatID = req.params.id;
       req.body.replyID = (await newReply).key;
       req.body.theMsgID = req.params.theMsgID;
       req.body.textColor = 'blue';
@@ -745,6 +746,65 @@ app.get('/admin/infinity', async (req, res) => {
   })
 
 
+  app.get('/:id/instructor/:theMsgID/:theReplyID/hideReply', async (req, res) => {
+    messageRef.child(req.params.id).child(req.params.theMsgID).child(req.params.theReplyID).once("value", function(snapshot) {
+        messageRef.child(req.params.id).child(req.params.theMsgID).child(req.params.theReplyID).update({
+              name: snapshot.val().name,
+              message: snapshot.val().message,
+              textColor: 'blue',
+              backgroundTextColor: '#b3b3b3',
+              owner: snapshot.val().owner,
+              state: 'hidden',
+              dateTime: snapshot.val().dateTime
+          });
+
+        req.body.theMsgID = req.params.theMsgID;
+        req.body.chatID = req.params.id;
+        req.body.replyID = req.params.theReplyID;
+        // req.body.name = snapshot.val().name;
+        // req.body.message = snapshot.val().message;
+        // req.body.textColor = 'black';
+        // req.body.backgroundTextColor = '#b3b3b3';
+        // req.body.owner = snapshot.val().owner;
+        // req.body.state = 'hidden';
+
+        res.redirect(`/${req.params.id}/instructor`);
+        io.emit('messageReplyHide', req.body);
+        
+    }, function (errorObject) {
+      console.log("The read failed: " + errorObject.code);
+    });      
+})
+
+app.get('/:id/instructor/:theMsgID/:theReplyID/unhideReply', async (req, res) => {
+  messageRef.child(req.params.id).child(req.params.theMsgID).child(req.params.theReplyID).once("value", function(snapshot) {
+      messageRef.child(req.params.id).child(req.params.theMsgID).child(req.params.theReplyID).update({
+            name: snapshot.val().name,
+            message: snapshot.val().message,
+            textColor: 'blue',
+            backgroundTextColor: 'white',
+            owner: snapshot.val().owner,
+            state: 'visible',
+            dateTime: snapshot.val().dateTime
+        });
+
+      req.body.theMsgID = req.params.theMsgID;
+      req.body.chatID = req.params.id;
+      req.body.replyID = req.params.theReplyID;
+      // req.body.name = snapshot.val().name;
+      // req.body.message = snapshot.val().message;
+      // req.body.textColor = 'black';
+      // req.body.backgroundTextColor = '#b3b3b3';
+      // req.body.owner = snapshot.val().owner;
+      // req.body.state = 'hidden';
+
+      res.redirect(`/${req.params.id}/instructor`);
+      io.emit('messageReplyUnhide', req.body);
+      
+  }, function (errorObject) {
+    console.log("The read failed: " + errorObject.code);
+  });      
+})
 
 
 
