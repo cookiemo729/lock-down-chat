@@ -27,7 +27,7 @@
         <img style="float: right;  width: 30%;" src="../public/images/nyplogo.gif" alt="NYPLOGO">
 
     <div class="jumbotron">
-        <h1 class="display-4">Welcome!</h1>
+        <h1 class="display-4">Lockdown Chat</h1>
         <h6>Only post questions about the eSA in this chat room. If you breach any of the assessment regulations or instructions by posting the answers in the chat room, you are liable to disciplinary action.</h6>
         <br>
         <!-- <input id="name" name="name" class="form-control" placeholder="Name (Module Group)" required>
@@ -66,11 +66,11 @@
     <% if(isInstructor == 'false') { %>
         <div>
             <div style="width: 45%; float: left;" id="MyMessage">
-                <h3 style="text-decoration: underline;">My Message</h3>
+                <h3 style="text-decoration: underline;">My Messages</h3>
 
             </div>
         <div style="width: 50%; float: right;" id="messagesStudent<%= MessageID %>">
-            <h3 style="text-decoration: underline;">Broadcast</h3>
+            <h3 style="text-decoration: underline;">Broadcast Messages</h3>
             <% for(var i = 0; i < theMessages.length - 2; i++) { %>
                 <% if(theMessages[i].owner == 'Student') { %>
                     <% if(theMessages[i].state == 'hidden') { %>
@@ -179,7 +179,7 @@
 <br/>
         <form method="POST" action="/<%= MessageID %>/instructor">
             <div class="jumbotron">
-                <h1 class="display-4">Broadcast Messages</h1>
+                <h1 class="display-4">Broadcast Message</h1>
                 <br>
                 <input id="name" name="name" class="form-control" placeholder="Name" required>
                 <br>
