@@ -271,6 +271,9 @@
         //             $("#" + GetMsgID).hide();
         //         }
         //     }
+        var TheChatID = document.getElementById("PendingChatID").innerHTML;
+
+        window.sessionStorage.setItem("TheChatID", JSON.stringify(TheChatID))
 
         var storedHasSth = 0;
         var myMessageName = document.getElementById("PendingMessageName").innerHTML;
@@ -351,7 +354,6 @@
         var PendingRepliesDateTime = [];
         var PendingRepliesState = [];
 
-        var TheChatID = document.getElementById("PendingChatID").innerHTML;
 
         var noOfmsgIDofreplies = $('.msgIDofreplies').length;
         var msgIDofrepliesIndex = 0;
@@ -488,7 +490,10 @@
         $("#messagesStudent" + theChatID).html('<h3 style="text-decoration: underline;">Broadcast Messages</h3>');
         $("#messagesInstructor" + theChatID).html('');
 
-        sessionStorage.clear();
+        var TheChatIDStored = JSON.parse(sessionStorage.getItem("TheChatID"));
+        if(TheChatIDStored == theChatID){
+            sessionStorage.clear();
+        }
     }
 
     $("#clearMessagesID").click(function(){
