@@ -741,8 +741,15 @@ app.get('/admin/infinity', async (req, res) => {
       req.body.textColor = 'blue';
       req.body.dateTime = day + ' ' + MonthText + ' ' + d.getFullYear() + ', ' + Time;
 
-      res.redirect(`/${req.params.id}/instructor`);
-      io.emit('repliesAdded', req.body);
+      messageRef.child(req.params.id).child(req.params.theMsgID).once("value", function(snapshot) {
+          req.body.MsgName = snapshot.val().name;
+          res.redirect(`/${req.params.id}/instructor`);
+          io.emit('repliesAdded', req.body);
+          
+      }, function (errorObject) {
+        console.log("The read failed: " + errorObject.code);
+      });      
+      
   })
 
 

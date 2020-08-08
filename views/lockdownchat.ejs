@@ -64,8 +64,7 @@
     <% } %>
 
     <% if(isInstructor == 'false') { %>
-        <div>
-            <div style="width: 45%; float: left;" id="MyMessage">
+            <div style="width: 45%; float: left;" id="MyMessage<%= MessageID %>">
                 <h3 style="text-decoration: underline;">My Messages</h3>
 
             </div>
@@ -109,7 +108,6 @@
             <% } %>
 
         </div>
-    </div>
     <% } else{ %>
         <div id="messagesInstructor<%= MessageID %>">
             <% for(var i = 0; i < theMessages.length - 2; i++) { %>
@@ -154,7 +152,7 @@
                                             <% } else { %>
                                             <a href="/<%= MessageID %>/instructor/<%= theMessagesIDs[i] %>/<%= repliesIDArray[a] %>/unhideReply" id="unhideReplyLinkBtn<%= repliesIDArray[a] %>" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Unhide Reply</a>
                                             <% } %>
-                                    <h4 style="color: <%= repliesArray[a].textColor %>;"><%= repliesArray[a].name %></h4>
+                                    <h4 style="color: <%= repliesArray[a].textColor %>;"><%= repliesArray[a].name %> <i class="fas fa-long-arrow-alt-right"></i> <%= theMessages[i].name %></h4>
                                     <p style="color: <%= repliesArray[a].textColor %>;"><%= repliesArray[a].message %></p>
                                     <p style="color: <%= repliesArray[a].textColor %>; text-align: right;"><%= repliesArray[a].dateTime %></p>
                                 </div>
@@ -213,6 +211,7 @@
 
 <% if(isInstructor == 'false') { %>
     <div id="PendingMessagesDivID" hidden>
+        <p id="PendingChatID"><%= MessageID %></p>
         <p id="PendingMessageName"><%= OwnMessageName %></p>
         <p id="PendingMessage"><%= OwnMessage %></p>
         <p id="PendingMessageID"><%= OwnMessageID %></p>
@@ -272,7 +271,6 @@
         //             $("#" + GetMsgID).hide();
         //         }
         //     }
-
 
         var storedHasSth = 0;
         var myMessageName = document.getElementById("PendingMessageName").innerHTML;
@@ -353,6 +351,8 @@
         var PendingRepliesDateTime = [];
         var PendingRepliesState = [];
 
+        var TheChatID = document.getElementById("PendingChatID").innerHTML;
+
         var noOfmsgIDofreplies = $('.msgIDofreplies').length;
         var msgIDofrepliesIndex = 0;
             if(noOfmsgIDofreplies != 0){
@@ -369,7 +369,7 @@
 
             for(m = 0; m < myMessageNameStored.length; m++){
                 if(myMessageNameStored[m] != ""){
-                    $("#MyMessage").append(`<div id="OwnMessageID${myMessageIDStored[m]}" style="background-color: #b3b3b3">
+                    $("#MyMessage" + TheChatID).append(`<div id="OwnMessageID${myMessageIDStored[m]}" style="background-color: #b3b3b3">
                     <h4 style="color: black;">${myMessageNameStored[m]}</h4>
                     <p style="color: black;">${myMessageStored[m]}</p>
                     <p style="color: black; text-align:right;">${myMessageDateTimeStored[m]}</p>
@@ -484,8 +484,11 @@
 
     }
     function ClearMessages(theChatID){
-        $("#messagesStudent" + theChatID).html('<h3 style="text-decoration: underline;">Broadcast</h3>');
+        $("#MyMessage" + theChatID).html('<h3 style="text-decoration: underline;">My Messages</h3>');
+        $("#messagesStudent" + theChatID).html('<h3 style="text-decoration: underline;">Broadcast Messages</h3>');
         $("#messagesInstructor" + theChatID).html('');
+
+        sessionStorage.clear();
     }
 
     $("#clearMessagesID").click(function(){
@@ -511,7 +514,7 @@
         $("#broadcastLinkBtn" + theReply.theMsgID).css({"display": "none"});
         $("#RepliesAtInstructor" + theReply.theMsgID).append(`<div id="RepliesByInstructor${theReply.replyID}">
             <a href="/${theReply.chatID}/instructor/${theReply.theMsgID}/${theReply.replyID}/hideReply" id="hideReplyLinkBtn${theReply.replyID}" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Hide Reply</a>
-                                                    <h4 style="color: ${theReply.textColor};">${theReply.replyName}</h4>
+                                                    <h4 style="color: ${theReply.textColor};">${theReply.replyName} <i class="fas fa-long-arrow-alt-right"></i> ${theReply.MsgName}</h4>
                                                     <p style="color: ${theReply.textColor};">${theReply.replyMessage}</p>
                                                     <p style="color: ${theReply.textColor}; text-align: right;">${theReply.dateTime}</p>
                                                 </div>`)
