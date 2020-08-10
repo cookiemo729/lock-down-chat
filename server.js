@@ -83,9 +83,8 @@ app.get('/createChat', (req, res) => {
     var d = new Date();
     var options = { hour12: false };
 
-    var date = d.toLocaleDateString();
-    var MonthText = getMonthText((date.substring(0,1) - 1));
-    var day = date.substring(2, 3);
+    var MonthText = getMonthText(d.getMonth());
+    var day = d.getDate();
     var Time = d.toLocaleTimeString('en-GB', options);
 
     // console.log(day + ' ' + MonthText + ' ' + d.getFullYear() + ', ' + Time);
@@ -104,9 +103,8 @@ app.get('/:id', (req, res) => {
     var d = new Date();
     var options = { hour12: false };
 
-    var date = d.toLocaleDateString();
-    var MonthText = getMonthText((date.substring(0,1) - 1));
-    var day = date.substring(2, 3);
+    var MonthText = getMonthText(d.getMonth());
+    var day = d.getDate();
     var Time = d.toLocaleTimeString('en-GB', options);
 
       var messageArray = [];
@@ -197,9 +195,8 @@ app.post('/:id', async (req, res) => {
     var d = new Date();
     var options = { hour12: false };
 
-    var date = d.toLocaleDateString();
-    var MonthText = getMonthText((date.substring(0,1) - 1));
-    var day = date.substring(2, 3);
+    var MonthText = getMonthText(d.getMonth());
+    var day = d.getDate();
     var Time = d.toLocaleTimeString('en-GB', options);
 
     messageRef.child(req.params.id).push({
@@ -274,9 +271,8 @@ app.get('/:id/instructor', (req, res) => {
     var d = new Date();
     var options = { hour12: false };
 
-    var date = d.toLocaleDateString();
-    var MonthText = getMonthText((date.substring(0,1) - 1));
-    var day = date.substring(2, 3);
+    var MonthText = getMonthText(d.getMonth());
+    var day = d.getDate();
     var Time = d.toLocaleTimeString('en-GB', options);
 
 
@@ -365,9 +361,8 @@ app.post('/:id/instructor', async (req, res) => {
     var d = new Date();
     var options = { hour12: false };
 
-    var date = d.toLocaleDateString();
-    var MonthText = getMonthText((date.substring(0,1) - 1));
-    var day = date.substring(2, 3);
+    var MonthText = getMonthText(d.getMonth());
+    var day = d.getDate();
     var Time = d.toLocaleTimeString('en-GB', options);
 
     messageRef.child(req.params.id).push({
@@ -720,9 +715,8 @@ app.get('/admin/infinity', async (req, res) => {
     var d = new Date();
     var options = { hour12: false };
 
-    var date = d.toLocaleDateString();
-    var MonthText = getMonthText((date.substring(0,1) - 1));
-    var day = date.substring(2, 3);
+    var MonthText = getMonthText(d.getMonth());
+    var day = d.getDate();
     var Time = d.toLocaleTimeString('en-GB', options);
 
     var newReply = messageRef.child(req.params.id).child(req.params.theMsgID).push({
