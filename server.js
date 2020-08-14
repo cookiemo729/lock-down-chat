@@ -144,6 +144,11 @@ app.get('/:id', (req, res) => {
           //     res.render('homepage', { errors });
               req.flash('error_msg', 'Please select "Create Chat Room"');
               res.redirect(`/`);
+
+              /**
+               * The following codes are for validating that the URL of a chat room is of a 
+               * certain complexity
+               */
           // var haveUpperCase = 0;
           // var haveLowerCase = 0;
           // var have16Characters = 0;

@@ -417,7 +417,6 @@
                 <p> ${message.message} </p>
                 <p style="text-align: right;">${message.dateTime}</p>
                 </div>`)
-                // $("#" + message.theMsgID).hide();
                                                                 //Instructor will have the reply function to reply to the specific student's message
                 $("#messagesInstructor" + message.chatID).append(`<div id="Instructor${message.theMsgID}" style="background-color: ${message.backgroundTextColor};">
                     <button id="replyOpenFormBtn${message.theMsgID}" onclick="reply_click(this.id)" type="button" class="btn btn-link" style="float: right; font-size: large; font-weight: bold; display: block;">Reply</button>
@@ -432,7 +431,7 @@
                         <button id="replyCloseFormBtn${message.theMsgID}" onclick="replyFormClose_Click(this.id)" class="btn btn-danger" style="float: right;" type="button"><i class="fas fa-times"></i></button>
                         <h1 class="display-4">Private Reply</h1>
                         <br/>
-                        <input id="replyName" name="replyName" class="form-control" placeholder="Name (Module Group)" required>
+                        <input id="replyName" name="replyName" class="form-control" placeholder="Name" required>
                         <br>
                         <textarea id="replyMessage" name="replyMessage" class="form-control" placeholder="Your Message Here" required></textarea>
                         <br>
