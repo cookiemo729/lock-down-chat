@@ -24,17 +24,12 @@
     <%- include('./partials/messages.ejs'); %>
     <% if(isInstructor == 'false') { %>
     <form method="POST" action="/<%= MessageID %>">
-        <img style="float: right;  width: 30%;" src="../public/images/nyplogo.gif" alt="NYPLOGO">
+        <img style="float: right;  width: 30%; height: 100%;" src="../public/images/nyplogo.gif" alt="NYPLOGO">
 
     <div class="jumbotron">
         <h1 class="display-4">Lockdown Chat</h1>
         <h6>Only post questions about the eSA in this chat room. If you breach any of the assessment regulations or instructions by posting the answers in the chat room, you are liable to disciplinary action.</h6>
         <br>
-        <!-- <input id="name" name="name" class="form-control" placeholder="Name (Module Group)" required>
-        <br>
-        <textarea id="message" name="message" class="form-control" placeholder="Your Message Here" required></textarea>
-        <br>
-        <button id="send" type="submit" class="btn btn-success">Send</button> -->
     </div>
     </form>
     <% } else{ %>
@@ -46,20 +41,12 @@
 <br/>
 <br/>
 <br/>
-        <!-- <form method="POST" action="/<%= MessageID %>/instructor"> -->
             <img style="float: right; width: 30%;" src="../public/images/nyplogo.gif" alt="NYPLOGO">
             <div class="jumbotron">
                 <h1 class="display-4">Instructor</h1>
-                <!-- <h1 class="display-4">Send Message</h1> -->
                 <h6>Only post questions about the eSA in this chat room. If you breach any of the assessment regulations or instructions by posting the answers in the chat room, you are liable to disciplinary action.</h6>
                 <br>
-                <!-- <input id="name" name="name" class="form-control" placeholder="Name" required>
-                <br>
-                <textarea id="message" name="message" class="form-control" placeholder="Your Message Here" required></textarea>
-                <br>
-                <button id="send" type="submit" class="btn btn-success">Send</button> -->
             </div>
-            <!-- </form> -->
 
     <% } %>
 
@@ -74,14 +61,12 @@
                 <% if(theMessages[i].owner == 'Student') { %>
                     <% if(theMessages[i].state == 'hidden') { %>
                     <div id="<%= theMessagesIDs[i] %>" style="background-color: #99ffbb; display: none;">
-                        <!-- <div class="state" hidden><%= theMessagesIDs[i] %><%= theMessages[i].state %></div> -->
                             <h4><%= theMessages[i].name %></h4>
                             <p><%= theMessages[i].message %></p>
                             <p style="text-align: right;"><%= theMessages[i].dateTime %></p>
                     </div>
                     <% } else { %>
                         <div id="<%= theMessagesIDs[i] %>" style="background-color: #99ffbb; display: block;">
-                            <!-- <div class="state" hidden><%= theMessagesIDs[i] %><%= theMessages[i].state %></div> -->
                                 <h4><%= theMessages[i].name %></h4>
                                 <p><%= theMessages[i].message %></p>
                             <p style="text-align: right;"><%= theMessages[i].dateTime %></p>
@@ -91,14 +76,12 @@
                 <% } else { %>
                     <% if(theMessages[i].state == 'hidden') { %>
                     <div id="<%= theMessagesIDs[i] %>" style="background-color: #ffffb3; display: none;">
-                        <!-- <div class="state" hidden><%= theMessagesIDs[i] %><%= theMessages[i].state %></div> -->
                             <h4 style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].name %></h4>
                             <p style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].message %></p>
                             <p style="color: <%= theMessages[i].textColor %>; text-align: right;"><%= theMessages[i].dateTime %></p>
                     </div>
                     <% } else { %>
                         <div id="<%= theMessagesIDs[i] %>" style="background-color: #ffffb3; display: block;">
-                            <!-- <div class="state" hidden><%= theMessagesIDs[i] %><%= theMessages[i].state %></div> -->
                                 <h4 style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].name %></h4>
                                 <p style="color: <%= theMessages[i].textColor %>;"><%= theMessages[i].message %></p>
                                 <p style="color: <%= theMessages[i].textColor %>; text-align: right;"><%= theMessages[i].dateTime %></p>
@@ -252,29 +235,16 @@
 <script>
    var socket = io();
     $(() => {
+        //Fixed the page at bottom whenever postback
         $(document).ready(function() {
         $(document).scrollTop($(document).height());    
       });
-        // var noOfDivForstate = $('.state').length;
-        //     var DivForstateIndex = 0;
-        //     do {
-        //         var DivForstateIDvar = $('.state').eq(DivForstateIndex);
-        //         DivForstateIndex++;
-        //         DivForstateIDvar.attr("id", "state" + DivForstateIndex);
-        //     } while (DivForstateIndex < noOfDivForstate);
 
-        //     for(f = 0; f < noOfDivForstate; f++){
-        //         var messageidAndState = document.getElementById("state" + (f+1)).innerHTML;
-
-        //         if(messageidAndState.substring(messageidAndState.length - 6) == 'hidden'){
-        //             var GetMsgID = messageidAndState.substring(0, messageidAndState.length - 6)
-        //             $("#" + GetMsgID).hide();
-        //         }
-        //     }
         var TheChatID = document.getElementById("PendingChatID").innerHTML;
-
+        //Passing in TheChatID value to set sessionStorage "TheChatID"
         window.sessionStorage.setItem("TheChatID", JSON.stringify(TheChatID))
 
+        //Student sends a message, get the message data from above hidden div
         var storedHasSth = 0;
         var myMessageName = document.getElementById("PendingMessageName").innerHTML;
         var myMessage = document.getElementById("PendingMessage").innerHTML;
@@ -282,12 +252,14 @@
         var myMessageDateTime = document.getElementById("PendingMessageDateTime").innerHTML;
         // var myMessageCurrentState = document.getElementById("PendingMessageCurrentState").innerHTML;
 
+        //Get the sessionStorage data (OwnMessageName, OwnMessage, OwnMessageID, OwnMessageDateTime) from the student's sessionStorage
         var myMessageNameStored = JSON.parse(sessionStorage.getItem("OwnMessageName"));
         var myMessageStored = JSON.parse(sessionStorage.getItem("OwnMessage"));
         var myMessageIDStored = JSON.parse(sessionStorage.getItem("OwnMessageID"));
         var myMessageDateTimeStored = JSON.parse(sessionStorage.getItem("OwnMessageDateTime"));
         // var myMessageCurrentStateStored = JSON.parse(sessionStorage.getItem("OwnMessageCurrentState"));
 
+        //If there no message, the student's sessionStorage is empty
         if(myMessageNameStored == null || myMessageNameStored == ""){
             storedHasSth = 0;
         }
@@ -295,6 +267,8 @@
             storedHasSth = 1;
         }
 
+        //If sessionStorage is empty, push new message sent to Array and set/pass it into sessionStorage
+        //This is so that everytime message is sent by student, system is able to identify the message sent by the browser
         if(storedHasSth == 0){
             var MessageNameToAdd = [];
             var MessageToAdd = [];
@@ -315,6 +289,9 @@
             // window.sessionStorage.setItem("OwnMessageCurrentState", JSON.stringify(MessageCurrentStateToAdd))
         }
         else{
+            //If sessionStorage is not empty, add the already stored message data in sessionStorage and the new message into the array
+            //Then set it to session storage as one
+            //This shows that the messages are sent by this specific student's browser
             var MessageNameToAdd = [];
             var MessageToAdd = [];
             var MessageIDToAdd = [];
@@ -341,12 +318,15 @@
             // window.sessionStorage.setItem("OwnMessageCurrentState", JSON.stringify(MessageCurrentStateToAdd))
         }
 
+        //Here gets the full stored sessionStorage message data
         myMessageNameStored = JSON.parse(sessionStorage.getItem("OwnMessageName"));
         myMessageStored = JSON.parse(sessionStorage.getItem("OwnMessage"));
         myMessageIDStored = JSON.parse(sessionStorage.getItem("OwnMessageID"));
         myMessageDateTimeStored = JSON.parse(sessionStorage.getItem("OwnMessageDateTime"));
         // myMessageCurrentStateStored = JSON.parse(sessionStorage.getItem("OwnMessageCurrentState"));
 
+
+        //***This is for replies to specific student's browser***
         var PendingRepliesMsgID = [];
         var PendingRepliesName = [];
         var PendingRepliesMessage = [];
@@ -355,10 +335,11 @@
         var PendingRepliesState = [];
 
 
-        var noOfmsgIDofreplies = $('.msgIDofreplies').length;
+        var noOfmsgIDofreplies = $('.msgIDofreplies').length;      //Getting the number of replies to the specific message
         var msgIDofrepliesIndex = 0;
             if(noOfmsgIDofreplies != 0){
                 do {
+                    //If have replies push them to Array
                     PendingRepliesMsgID.push(document.getElementById("PendingRepliesMsgID" + msgIDofrepliesIndex).innerHTML);
                     PendingRepliesName.push(document.getElementById("PendingRepliesName" + msgIDofrepliesIndex).innerHTML);
                     PendingRepliesMessage.push(document.getElementById("PendingRepliesMessage" + msgIDofrepliesIndex).innerHTML);
@@ -368,7 +349,10 @@
                     msgIDofrepliesIndex++;
                 } while (msgIDofrepliesIndex < noOfmsgIDofreplies);
             }
+        //***This is for replies to specific student's browser***
 
+            //Foreach message stored in sessionStorage
+            //Add the message to the student's My Message
             for(m = 0; m < myMessageNameStored.length; m++){
                 if(myMessageNameStored[m] != ""){
                     $("#MyMessage" + TheChatID).append(`<div id="OwnMessageID${myMessageIDStored[m]}" style="background-color: #b3b3b3">
@@ -379,6 +363,7 @@
                     <div id="RepliesAtStudent${myMessageIDStored[m]}">
                     </div>`)
 
+                    //If the reply message id == to the message id, add the reply to the student's my message
                     for(r = 0; r < PendingRepliesMsgID.length; r++){
                         if(PendingRepliesMsgID[r] == myMessageIDStored[m]){
                             $("#RepliesAtStudent" + PendingRepliesMsgID[r]).append(`<div id="RepliesToStudent${PendingRepliesID[r]}">
@@ -386,7 +371,7 @@
                                                         <p style="color: blue;">${PendingRepliesMessage[r]}</p>
                                                         <p style="color: blue; text-align: right;">${PendingRepliesDateTime[r]}</p>
                                                     </div>`)
-                            
+                            //For the hide and unhide reply
                             if(PendingRepliesState[r] == 'hidden'){
                                 $("#RepliesToStudent" + PendingRepliesID[r]).css({"display": "none"});
                             }
@@ -400,6 +385,7 @@
             
     })
 
+    //Socket io gets the back end data to front-end
     socket.on('message', addMessages)
     socket.on('messageHide', hideMessages)
     socket.on('messageBroadcast', BroadcastMessages)
@@ -408,8 +394,10 @@
     socket.on('messageReplyHide', messageReplyHide)
     socket.on('messageReplyUnhide', messageReplyUnhide)
     
+    //Add message to student's broadcast and instructor site
     function addMessages(message){
-            if(message.owner == "Instructor"){
+        //Appending the message specific chat room
+            if(message.owner == "Instructor"){                  //If new message sent is by instructor, display it in student and instructor site visible
                 $("#messagesStudent" + message.chatID).append(`<div id="${message.theMsgID}" style="background-color: ${message.backgroundTextColor};">
                 <h4 style="color: ${message.textColor};"> ${message.name} </h4>
                 <p style="color: ${message.textColor};"> ${message.message} </p>
@@ -423,14 +411,14 @@
                 <p style="color: ${message.textColor}; text-align: right;">${message.dateTime}</p>
                 </div>`)
             }
-            else{
+            else{                                                //If new message sent is by student, display it in student hidden because the instructor needs to broadcast it to be visible for all students
                 $("#messagesStudent" + message.chatID).append(`<div id="${message.theMsgID}" style="background-color: #99ffbb; display: none">
                 <h4> ${message.name} </h4>
                 <p> ${message.message} </p>
                 <p style="text-align: right;">${message.dateTime}</p>
                 </div>`)
                 // $("#" + message.theMsgID).hide();
-
+                                                                //Instructor will have the reply function to reply to the specific student's message
                 $("#messagesInstructor" + message.chatID).append(`<div id="Instructor${message.theMsgID}" style="background-color: ${message.backgroundTextColor};">
                     <button id="replyOpenFormBtn${message.theMsgID}" onclick="reply_click(this.id)" type="button" class="btn btn-link" style="float: right; font-size: large; font-weight: bold; display: block;">Reply</button>
                     <a href="/${message.chatID}/instructor/${message.theMsgID}/broadcast" id="broadcastLinkBtn${message.theMsgID}" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Broadcast</a>
@@ -453,21 +441,22 @@
                 </form>`)
             }
     }
+
+    //Hide function - student hidden, instructor visible but grey background color, links will change to broadcast function for reverse
     function hideMessages(hiddenMsg){
-        // $("#" + hiddenMsg.theMsgID).hide();
         $("#" + hiddenMsg.theMsgID).css({"display": "none"});
         $("#Instructor" + hiddenMsg.theMsgID).css({"background-color": "#b3b3b3"});
         var str = document.getElementById("Instructor" + hiddenMsg.theMsgID).innerHTML;
         str = str.replace("Hide", "Broadcast")
         str = str.replace("/hide", "/broadcast")
         str = str.replace("hideLinkBtn", "broadcastLinkBtn")
-        // str = str.replace("/" + hiddenMsg.chatID + "/instructor/" + hiddenMsg.chatID + "/hide", "/" + hiddenMsg.chatID + "/instructor/" + hiddenMsg.chatID + "/unhide")
         $("#Instructor" + hiddenMsg.theMsgID).html(str);
 
         $("#replyOpenFormBtn" + hiddenMsg.theMsgID).css({"display": "block"});
     }
+
+    //Broadcast function - student visible, instructor visible, links will change to hide function for reverse
     function BroadcastMessages(hiddenMsg){
-        // $("#" + hiddenMsg.theMsgID).show();
         $("#" + hiddenMsg.theMsgID).css({"display": "block"});
         if(hiddenMsg.owner == "Instructor"){
             $("#Instructor" + hiddenMsg.theMsgID).css({"background-color": "#ffffb3"});
@@ -479,18 +468,19 @@
         str = str.replace("Broadcast", "Hide")
         str = str.replace("/broadcast", "/hide")
         str = str.replace("broadcastLinkBtn", "hideLinkBtn")
-        // str = str.replace("/" + hiddenMsg.chatID + "/instructor/" + hiddenMsg.chatID + "/unhide", "/" + hiddenMsg.chatID + "/instructor/" + hiddenMsg.chatID + "/hide")
         $("#Instructor" + hiddenMsg.theMsgID).html(str);
 
         $("#replyOpenFormBtn" + hiddenMsg.theMsgID).css({"display": "none"});
 
     }
+
+    //When instructor clicks "Clear all messages" in the chat room
     function ClearMessages(theChatID){
         $("#MyMessage" + theChatID).html('<h3 style="text-decoration: underline;">My Messages</h3>');
         $("#messagesStudent" + theChatID).html('<h3 style="text-decoration: underline;">Broadcast Messages</h3>');
         $("#messagesInstructor" + theChatID).html('');
 
-        var TheChatIDStored = JSON.parse(sessionStorage.getItem("TheChatID"));
+        var TheChatIDStored = JSON.parse(sessionStorage.getItem("TheChatID"));  //Clearing sessionStorage only for students in the chat room not other students in another chat room
         if(TheChatIDStored == theChatID){
             sessionStorage.clear();
         }
@@ -505,25 +495,29 @@
         $("#clearMessagesBtnID").click()
     });
 
+    //Display Private reply form
     function reply_click(replyOpenFormBtnID){
         var MsgIDOfreplyOpenFormBtn = replyOpenFormBtnID.substring(16)
         $("#replyForm" + MsgIDOfreplyOpenFormBtn).css({"display": "block"});
     }
 
+    //Close Private reply form
     function replyFormClose_Click(replyCloseFormBtnID){
         var MsgIDOfreplyCloseFormBtn = replyCloseFormBtnID.substring(17)
         $("#replyForm" + MsgIDOfreplyCloseFormBtn).css({"display": "none"});
     }
 
+    //Instructor adds a reply to a student's message
     function repliesAdded(theReply){
-        $("#broadcastLinkBtn" + theReply.theMsgID).css({"display": "none"});
+        $("#broadcastLinkBtn" + theReply.theMsgID).css({"display": "none"});            //****No broadcast for messages with replies because it is private****
+                        //Append the new reply to instructor and student
         $("#RepliesAtInstructor" + theReply.theMsgID).append(`<div id="RepliesByInstructor${theReply.replyID}">
             <a href="/${theReply.chatID}/instructor/${theReply.theMsgID}/${theReply.replyID}/hideReply" id="hideReplyLinkBtn${theReply.replyID}" class="btn clever-btn btn-2" style="float: right; font-size: large; font-weight: bold;">Hide Reply</a>
                                                     <h4 style="color: ${theReply.textColor};">${theReply.replyName} <i class="fas fa-long-arrow-alt-right"></i> ${theReply.MsgName}</h4>
                                                     <p style="color: ${theReply.textColor};">${theReply.replyMessage}</p>
                                                     <p style="color: ${theReply.textColor}; text-align: right;">${theReply.dateTime}</p>
                                                 </div>`)
-        //display replies first then do the io to append the replies
+        //display replies first (after clicking reply button) then io to append the replies
         $("#RepliesAtStudent" + theReply.theMsgID).append(`<div id="RepliesToStudent${theReply.replyID}">
                                                     <h4 style="color: ${theReply.textColor};">${theReply.replyName}</h4>
                                                     <p style="color: ${theReply.textColor};">${theReply.replyMessage}</p>
@@ -532,6 +526,7 @@
 
     }
 
+    //Instructor hides reply
     function messageReplyHide(replyMsg){
         $("#RepliesToStudent" + replyMsg.replyID).css({"display": "none"});
         $("#RepliesByInstructor" + replyMsg.replyID).css({"background-color": "#b3b3b3"});
@@ -542,6 +537,7 @@
         $("#RepliesByInstructor" + replyMsg.replyID).html(str);
     }
 
+    //Instructor unhide reply
     function messageReplyUnhide(replyMsg){
         $("#RepliesToStudent" + replyMsg.replyID).css({"display": "block"});
         $("#RepliesByInstructor" + replyMsg.replyID).css({"background-color": "white"});

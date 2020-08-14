@@ -104,10 +104,11 @@
 
   <script>
     var socket = io();
-    $(() => {
+    // $(() => {
       
-    })
+    // })
 
+    //Socket io gets the back end data to front-end
     socket.on('adminNewChat', displayNewChat)
     socket.on('adminUpdateLastMsgDateTime', updateLastMsgDateTime)
     socket.on('adminUpdateAfterClearMessages', UpdateAfterClearMessages)
@@ -115,6 +116,7 @@
     socket.on('adminUpdateAfterClearSpecificChatRoom', UpdateAfterClearSpecificChatRoom)
     socket.on('adminUpdateAfter4WeeksAgoChatRooms', UpdateAfter4WeeksAgoChatRooms)
     
+    //Appends new chat to Admin site
     function displayNewChat(theChat){
       $("#adminChatsID").find('tbody').append(`<tr id="theRowOfChatID${theChat.chatID}">
                    <td>${theChat.chatID}</td>
@@ -128,6 +130,7 @@
                  </tr>`);
     }
 
+    //Update last message datetime in admin site whenever a new message is added in chat room
     function updateLastMsgDateTime(theLastMessage){
       var table = document.getElementById("adminChatsID");
       var rowIndex = document.getElementById(`theRowOfChatID${theLastMessage.chatID}`).rowIndex;
@@ -136,8 +139,8 @@
       checkEverytime();
     }
 
+    //Update datetime to '-' in admin site as all messages are cleared in the chat room
     function UpdateAfterClearMessages(theChatID){
-      //Update the last message datetime everytime a message is posted in chat room
       var table = document.getElementById("adminChatsID");
       var rowIndex = document.getElementById(`theRowOfChatID${theChatID}`).rowIndex;
       table.rows[rowIndex].cells[1].innerHTML = `-`
@@ -145,6 +148,7 @@
       checkEverytime();
     }
 
+    //Update clearing all chat rooms at admin site
     function UpdateAfterClearAllChatRooms(ChatRmIDsArray){
       var table = document.getElementById("adminChatsID");
       var tableref = document.getElementById("adminChatsID").getElementsByTagName('tbody')[0];
@@ -158,7 +162,7 @@
                                                              </button>`
     }
 
-
+    //Update clearing 4 weeks ago chat rooms at admin site
     function UpdateAfter4WeeksAgoChatRooms(ChatRmIDsArray){
       var table = document.getElementById("adminChatsID");
       for(i = 0; i < ChatRmIDsArray.length; i++){
@@ -174,7 +178,7 @@
                                                               </button>`
     }
 
-
+    //Update after deleting specific chat room at admin site
     function UpdateAfterClearSpecificChatRoom(ChatRmID){
       var table = document.getElementById("adminChatsID");
       var rowIndex = document.getElementById(`theRowOfChatID${ChatRmID}`).rowIndex;
@@ -188,6 +192,7 @@
                                                              </button>`
     }
 
+    //To sort the datetime of chat rooms according to oldest to newest
     function checkEverytime(){
       var ChatRmIDArray = [];
       var DateTimeOfLastMsgInEachChatRmArray = [];
