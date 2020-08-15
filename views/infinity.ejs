@@ -27,14 +27,7 @@
       <h2 class="pagetitle">Admin View</h2>
       <br/>
       <br/>
-      <!-- <form method="POST" action="/admin/infinity/Clear4WeeksAgoChatRms">
-        <button id="clear4WeeksAgoChatRmsID" type="button" data-toggle="modal" data-target="#exampleModal" class="btn btn-danger clearAll">Clear 4 Weeks Ago Chat Rooms</button>
-        <button id="clear4WeeksAgoChatRmsBtnID" type="submit" data-toggle="modal" data-target="#exampleModal" class="btn btn-danger clearAll" hidden>Clear 4 Weeks Ago Chat Rooms</button>
-    </form> -->
-    <!-- <br/>
-    <br/>
-    <br/>
-    <br/> -->
+
       <form method="POST" action="/admin/infinity">
         <button id="clearChatsID" type="button" data-toggle="modal" data-target="#exampleModal" class="btn btn-danger clearAll">Clear All Chat Rooms</button>
         <button id="clearChatsBtnID" type="submit" data-toggle="modal" data-target="#exampleModal" class="btn btn-danger clearAll" hidden>Clear All Chat Rooms</button>
@@ -104,9 +97,6 @@
 
   <script>
     var socket = io();
-    // $(() => {
-      
-    // })
 
     //Socket io gets the back end data to front-end
     socket.on('adminNewChat', displayNewChat)
@@ -225,10 +215,6 @@
               return list
             })
 
-          // list.sort(function(a, b) {
-          //   return ((a.LastMsgDateTime < b.LastMsgDateTime) ? -1 : ((a.LastMsgDateTime > b.LastMsgDateTime) ? 1 : 0));
-          // });
-
           for (var k = 0; k < list.length; k++) {
             ChatRmIDArray[k] = list[k].ChatRmID;
             DateTimeOfLastMsgInEachChatRmArray[k] = list[k].LastMsgDateTime;
@@ -268,13 +254,6 @@
       $('#exampleModal').modal('show')
   });
 
-  // $("#clear4WeeksAgoChatRmsID").click(function(){
-  //           document.getElementById("modal-bodyID").innerHTML = "";
-  //           document.getElementById("modal-bodyID").innerHTML += "<p hidden id='idOfDeleteBtn'>clear4WeeksAgoChatRmsID</p>";
-  //           document.getElementById("modal-bodyID").innerHTML += "<p>Are you sure to clear 4 Weeks ago Chat Rooms?</p>";
-  //     $('#exampleModal').modal('show')
-  // });
-
   $('#ModalPopUpForDeletion').on('click', 'button[name$="ConfirmDeleteBtnInModal"]', function () {
       var idOfBtn = document.getElementById("idOfDeleteBtn").innerHTML;
       var ClearSpecificChatText = idOfBtn.substring(0, 20);
@@ -290,9 +269,6 @@
       else if(ClearSpecificChatText == 'clearSpecificChatsID'){
         $('#clearSpecificChatsBtnID' + ClearSpecificChatID).click();
       }
-      // else if(idOfBtn == 'clear4WeeksAgoChatRmsID'){
-      //   $('#clear4WeeksAgoChatRmsBtnID').click();
-      // }
   });
 </script>
 </body>

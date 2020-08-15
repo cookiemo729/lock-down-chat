@@ -1,5 +1,4 @@
 var express = require('express');
-// var bodyParser = require('body-parser')
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
@@ -7,7 +6,6 @@ const expressLayouts = require('express-ejs-layouts');
 const flash = require('connect-flash');
 const session = require('express-session');
 const database = require('./config/accessFirebase');
-// const { Console } = require('console');
 var PORT = process.env.PORT || 3000;
 
 // EJS
@@ -15,11 +13,8 @@ app.use(expressLayouts);
 app.set('view engine', 'ejs');
 
 // Express body parser
-// app.use(express.static(__dirname));
-// app.use(bodyParser.json());
 app.use('/public/images/', express.static('./public/images'));
 app.use(express.urlencoded({ extended: true }));
-// app.use(bodyParser.urlencoded({extended: false}))
 
 // Express session
 app.use(
@@ -139,63 +134,8 @@ app.get('/:id', (req, res) => {
 
         }
         else{
-          // let errors = [];
-          //     errors.push({ msg: 'Please select "Create Chat Room"' });
-          //     res.render('homepage', { errors });
               req.flash('error_msg', 'Please select "Create Chat Room"');
               res.redirect(`/`);
-
-              /**
-               * The following codes are for validating that the URL of a chat room is of a 
-               * certain complexity
-               */
-          // var haveUpperCase = 0;
-          // var haveLowerCase = 0;
-          // var have16Characters = 0;
-          //Validating the Chat room ID
-            // if(req.params.id.length < 16){
-            //   errors.push({ msg: 'Chat Room ID must be at least 16 characters' });
-            // }
-            // else{
-            //   have16Characters = 1;
-            // }
-
-            
-            // for(i = 0; i < req.params.id.length; i++){
-            //       if (req.params.id[i] == req.params.id[i].toUpperCase()) {
-            //           haveUpperCase = 1;
-            //           break;
-            //       }
-            // }
-
-            // if(haveUpperCase == 0){
-            //     errors.push({ msg: 'Chat Room ID must have an Uppercase letter' });
-            // }
-
-            // for(i = 0; i < req.params.id.length; i++){
-            //   if (req.params.id[i] == req.params.id[i].toLowerCase()) {
-            //     haveLowerCase = 1;
-            //       break;
-            //   }
-            // }
-            // if(haveLowerCase == 0){
-            //   errors.push({ msg: 'Chat Room ID must have an Lowercase letter' });
-            // }
-            // //If validation pass
-            // if(haveUpperCase == 1 && haveLowerCase == 1 && have16Characters == 1){
-            //   messageRef.child(req.params.id).set({                                   //Set name and datetime to the newly inserted chat room id
-            //     name: '',
-            //     dateTime: day + ' ' + MonthText + ' ' + d.getFullYear() + ', ' + Time
-            //   });
-            //   req.flash('success_msg', 'Chat Room ' + req.params.id + ' entered');
-            //   req.body.chatID = req.params.id
-            //   res.redirect(`/${req.params.id}`);                                       //Redirect to newly created chat room
-            //   io.emit("adminNewChat", req.body)                                        //Pass the req.body data to front-end for socket.io
-            // }
-            // else{
-            //   res.render('homepage', { errors });                                      //Display errors if validation fails
-            // }
-
         }
     }, function (errorObject) {
       console.log("The read failed: " + errorObject.code);
@@ -236,7 +176,7 @@ app.post('/:id', async (req, res) => {
          });          
 
          req.body.theMsgID = dataArray.slice(-3)[0];
-        //  console.log(req.body.theMsgID);
+
          io.emit('message', req.body);                                                  //Pass the req.body data to front-end for socket.io
          io.emit('adminUpdateLastMsgDateTime', req.body);                               //Pass the req.body data to front-end for socket.io
 
@@ -265,7 +205,6 @@ app.post('/:id', async (req, res) => {
                     }
                   })
                 });          
-                // console.log(messageIDArray.slice(-3)[0]);
                                                                                           //Pass the Arrays to front-end for display
               res.render('lockdownchat', { theMessages: messageArray, theMessagesIDs: messageIDArray, MessageID: req.params.id, isInstructor: 'false', OwnMessageName: req.body.name, OwnMessage: req.body.message, OwnMessageID: messageIDArray.slice(-3)[0], OwnMessageDateTime: req.body.dateTime, repliesArray: repliesArray, MsgIDOfrepliesArray: MsgIDOfrepliesArray, repliesIDArray: repliesIDArray });
       
@@ -312,63 +251,12 @@ app.get('/:id/instructor', (req, res) => {
               }
             })
         });
-
-        // req.flash('success_msg', 'Chat Room ' + req.params.id + ' entered as instructor');
                                                                                                   //Pass the Arrays to front-end for display
         res.render('lockdownchat', { theMessages: messageArray, theMessagesIDs: messageIDArray, MessageID: req.params.id, success_msg: req.flash('success_msg'), isInstructor: 'true', repliesArray: repliesArray, MsgIDOfrepliesArray: MsgIDOfrepliesArray, repliesIDArray: repliesIDArray });
       }
       else{
-        // let errors = [];
-        //       errors.push({ msg: 'Please select "Create Chat Room"' });
-        //       res.render('homepage', { errors });
               req.flash('error_msg', 'Please select "Create Chat Room"');
               res.redirect(`/`);
-              
-        // var haveUpperCase = 0;
-        // var haveLowerCase = 0;
-        // var have16Characters = 0;
-        // //Validating the Chat room ID
-        //   if(req.params.id.length < 16){
-        //     errors.push({ msg: 'Chat Room ID must be at least 16 characters' });
-        //   }
-        //   else{
-        //     have16Characters = 1;
-        //   }
-
-          
-        //   for(i = 0; i < req.params.id.length; i++){
-        //         if (req.params.id[i] == req.params.id[i].toUpperCase()) {
-        //             haveUpperCase = 1;
-        //             break;
-        //         }
-        //   }
-
-        //   if(haveUpperCase == 0){
-        //       errors.push({ msg: 'Chat Room ID must have an Uppercase letter' });
-        //   }
-
-        //   for(i = 0; i < req.params.id.length; i++){
-        //     if (req.params.id[i] == req.params.id[i].toLowerCase()) {
-        //       haveLowerCase = 1;
-        //         break;
-        //     }
-        //   }
-        //   if(haveLowerCase == 0){
-        //     errors.push({ msg: 'Chat Room ID must have an Lowercase letter' });
-        //   }
-        //   //If validation pass
-        //   if(haveUpperCase == 1 && haveLowerCase == 1 && have16Characters == 1){
-        //     messageRef.child(req.params.id).set({                                                         //Set name and datetime to the newly inserted chat room id
-        //       name: '',
-        //       dateTime: day + ' ' + MonthText + ' ' + d.getFullYear() + ', ' + Time
-        //     });
-        //     // req.flash('success_msg', 'Chat Room ' + req.params.id + ' entered as instructor');
-        //     res.redirect(`/${req.params.id}/instructor`);                                                 //Redirect to newly created chat room
-        //   }
-        //   else{
-        //     res.render('homepage', { errors });
-        //   }
-
       }
   }, function (errorObject) {
     console.log("The read failed: " + errorObject.code);
@@ -410,7 +298,6 @@ app.post('/:id/instructor', async (req, res) => {
          req.body.theMsgID = dataArray.slice(-3)[0];
          req.body.chatID = req.params.id;
 
-        //  console.log(req.body.theMsgID);
          io.emit('message', req.body);                                                    //Pass the req.body data to front-end for socket.io
          io.emit('adminUpdateLastMsgDateTime', req.body);                                 //Pass the req.body data to front-end for socket.io
 
@@ -482,12 +369,6 @@ app.get('/:id/instructor/:theMsgID/hide', async (req, res) => {
 
             req.body.theMsgID = req.params.theMsgID;
             req.body.chatID = req.params.id;
-            // req.body.name = snapshot.val().name;
-            // req.body.message = snapshot.val().message;
-            // req.body.textColor = 'black';
-            // req.body.backgroundTextColor = '#b3b3b3';
-            // req.body.owner = snapshot.val().owner;
-            // req.body.state = 'hidden';
 
             res.redirect(`/${req.params.id}/instructor`);                                                    //Redirect to instructor page
             io.emit('messageHide', req.body);                                                                //Pass the req.body data to front-end for socket.io
@@ -525,12 +406,7 @@ app.get('/:id/instructor/:theMsgID/broadcast', async (req, res) => {
     
       req.body.theMsgID = req.params.theMsgID;
       req.body.chatID = req.params.id;
-      // req.body.name = snapshot.val().name;
-      // req.body.message = snapshot.val().message;
-      // req.body.textColor = '#000000';
-      // req.body.backgroundTextColor = '#99ffbb';
       req.body.owner = snapshot.val().owner;
-      // req.body.state = 'visible';
 
       res.redirect(`/${req.params.id}/instructor`);                                                       //Redirect to instructor page
       io.emit('messageBroadcast', req.body);                                                              //Pass the req.body data to front-end for socket.io
@@ -566,8 +442,8 @@ app.get('/admin/infinity', async (req, res) => {
 
   messageRef.on("value", function(snapshot) {                  //Retrieve all chat rooms
       snapshot.forEach((child) => {                            //Foreach chat room ID
-          // ChatRmIDArray.push(child.key)
-          var AllDateTimeOfCurrentChatRm = [];
+
+        var AllDateTimeOfCurrentChatRm = [];
           child.forEach((childchild) => {                      //Foreach attribute in specific chat room ID
               AllDateTimeOfCurrentChatRm.push(childchild.val().dateTime);        //Push datetime of each message to Array, NOT chat room datetime
           });
@@ -601,10 +477,6 @@ app.get('/admin/infinity', async (req, res) => {
               if (date1 < date2) return -1;
             })
 
-          // list.sort(function(a, b) {
-          //     return ((a.LastMsgDateTime < b.LastMsgDateTime) ? -1 : ((a.LastMsgDateTime > b.LastMsgDateTime) ? 1 : 0));
-          // });
-
           for (var k = 0; k < list.length; k++) {                                                               // Split chat room ID and last message datetime pair to their own Array
             ChatRmIDArray[k] = list[k].ChatRmID;
             DateTimeOfLastMsgInEachChatRmArray[k] = list[k].LastMsgDateTime;
@@ -612,8 +484,6 @@ app.get('/admin/infinity', async (req, res) => {
 
           ChatRmIDArray = ChatRmIDArray.concat(ChatRmIDWithoutDateTime);                                        // .concat adds an array's values to an array
           DateTimeOfLastMsgInEachChatRmArray = DateTimeOfLastMsgInEachChatRmArray.concat(WithoutDateTimeOfLastMsgInEachChatRmArray);        //Adding no datetime chat room to have date time chat room array
-
-          // res.render('infinity', { ChatRmIDs: ChatRmIDArray, DateTimeOfLastMsgInEachChatRm: DateTimeOfLastMsgInEachChatRmArray})
 
         }, function (errorObject) {
           console.log("The read failed: " + errorObject.code);
@@ -623,70 +493,6 @@ app.get('/admin/infinity', async (req, res) => {
 
   })
   
-  // app.post('/admin/infinity', async (req, res) => {
-
-  //   var ChatRmIDArray = [];
-  //   var DateTimeOfLastMsgInEachChatRmArray = [];
-
-  //   var ChatRmIDWithoutDateTime = [];
-  //   var WithoutDateTimeOfLastMsgInEachChatRmArray = [];
-  
-  //   var ChatRmIDToEmit = [];
-
-  // messageRef.on("value", function(snapshot) {
-  //     snapshot.forEach((child) => {
-  //         var AllDateTimeOfCurrentChatRm = [];
-  //         child.forEach((childchild) => {
-  //             AllDateTimeOfCurrentChatRm.push(childchild.val().dateTime);
-  //         });
-
-
-  //         if(AllDateTimeOfCurrentChatRm.length > 2){
-  //             ChatRmIDArray.push(child.key)
-  //             DateTimeOfLastMsgInEachChatRmArray.push(AllDateTimeOfCurrentChatRm.slice(-3)[0]);
-  //         }
-  //         else{
-  //             ChatRmIDWithoutDateTime.push(child.key);
-  //             WithoutDateTimeOfLastMsgInEachChatRmArray.push('-');
-  //         };
-
-  //      });
-
-  //       }, function (errorObject) {
-  //         console.log("The read failed: " + errorObject.code);
-  //       });
-
-  //       var list = [];
-  //         var d = new Date();
-  //         var options = { hour12: false };
-
-  //         for (var j = 0; j < ChatRmIDArray.length; j++) 
-  //         list.push({'ChatRmID': ChatRmIDArray[j], 'LastMsgDateTime': DateTimeOfLastMsgInEachChatRmArray[j]});
-
-  //         for(x = 0; x < list.length; x++){
-  //           var result = new Date(list[x].LastMsgDateTime);
-  //           result.setDate(result.getDate() + 28);
-  //           // result = result.toLocaleString('en-GB', options);
-  //           // console.log(result);
-  //           // console.log(d)
-  //           if(result < d){
-  //             // console.log("The ID IS : " + list[x].ChatRmID);
-  //             ChatRmIDToEmit.push(list[x].ChatRmID);
-  //             // console.log(ChatRmIDToEmit);
-  //             let specificChatToRemove = messageRef.child(list[x].ChatRmID);
-  //             specificChatToRemove.remove();
-  //             // console.log("Deleted")
-  //           }
-  //         }
-
-  //         req.flash('success_msg', 'Successfully cleared chat rooms from 4 weeks ago!');
-  //         res.redirect(`/admin/infinity`);
-  //         io.emit('adminUpdateAfterClearAllChatRooms', ChatRmIDToEmit);
-  // })
-
-  
-
-
   //Clear all chats
   app.post('/admin/infinity', async (req, res) => {
     let chatsToClear = messageRef;                                //Reference to all chat rooms
@@ -722,9 +528,6 @@ app.get('/admin/infinity', async (req, res) => {
           }, function (errorObject) {
             console.log("The read failed: " + errorObject.code);
           });
-
-          // console.log(ChatRmIDArray)
-          // console.log(DateTimeOfEachChatRmArray)
 
           var list = [];
           var d = new Date();
@@ -802,12 +605,6 @@ app.get('/admin/infinity', async (req, res) => {
         req.body.theMsgID = req.params.theMsgID;
         req.body.chatID = req.params.id;
         req.body.replyID = req.params.theReplyID;
-        // req.body.name = snapshot.val().name;
-        // req.body.message = snapshot.val().message;
-        // req.body.textColor = 'black';
-        // req.body.backgroundTextColor = '#b3b3b3';
-        // req.body.owner = snapshot.val().owner;
-        // req.body.state = 'hidden';
 
         res.redirect(`/${req.params.id}/instructor`);
         io.emit('messageReplyHide', req.body);                      //Pass the reply ID to front-end, so that front-end can identify the reply to hide and change background color to grey
@@ -834,13 +631,7 @@ app.get('/:id/instructor/:theMsgID/:theReplyID/unhideReply', async (req, res) =>
       req.body.theMsgID = req.params.theMsgID;
       req.body.chatID = req.params.id;
       req.body.replyID = req.params.theReplyID;
-      // req.body.name = snapshot.val().name;
-      // req.body.message = snapshot.val().message;
-      // req.body.textColor = 'black';
-      // req.body.backgroundTextColor = '#b3b3b3';
-      // req.body.owner = snapshot.val().owner;
-      // req.body.state = 'hidden';
-
+      
       res.redirect(`/${req.params.id}/instructor`);
       io.emit('messageReplyUnhide', req.body);                    //Pass the reply ID to front-end, so that front-end can identify the reply to unhide and change background color to white
       

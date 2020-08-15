@@ -7,11 +7,6 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
   
-  <!-- <script>
-      $(document).ready(function() {
-        $(document).scrollTop($(document).height());    
-      });
-  </script> -->
 </head>
 <body>
     <style>
@@ -37,7 +32,6 @@
             <button id="clearMessagesID" type="button" data-toggle="modal" data-target="#exampleModal" class="btn btn-danger" style="font-weight: bold; float: right;">Clear All Messages</button>
             <button id="clearMessagesBtnID" type="submit" data-toggle="modal" data-target="#exampleModal" class="btn btn-danger" style="font-weight: bold; float: right;" hidden>Clear All Messages</button>
         </form>
-        <!-- <a href="/<%= MessageID %>/instructor/clear" id="clearMessagesLinkID" class="btn btn-danger" style="font-weight: bold; float: right;" hidden>Clear Messages</a> -->
 <br/>
 <br/>
 <br/>
@@ -250,14 +244,12 @@
         var myMessage = document.getElementById("PendingMessage").innerHTML;
         var myMessageID = document.getElementById("PendingMessageID").innerHTML;
         var myMessageDateTime = document.getElementById("PendingMessageDateTime").innerHTML;
-        // var myMessageCurrentState = document.getElementById("PendingMessageCurrentState").innerHTML;
 
         //Get the sessionStorage data (OwnMessageName, OwnMessage, OwnMessageID, OwnMessageDateTime) from the student's sessionStorage
         var myMessageNameStored = JSON.parse(sessionStorage.getItem("OwnMessageName"));
         var myMessageStored = JSON.parse(sessionStorage.getItem("OwnMessage"));
         var myMessageIDStored = JSON.parse(sessionStorage.getItem("OwnMessageID"));
         var myMessageDateTimeStored = JSON.parse(sessionStorage.getItem("OwnMessageDateTime"));
-        // var myMessageCurrentStateStored = JSON.parse(sessionStorage.getItem("OwnMessageCurrentState"));
 
         //If there no message, the student's sessionStorage is empty
         if(myMessageNameStored == null || myMessageNameStored == ""){
@@ -274,19 +266,16 @@
             var MessageToAdd = [];
             var MessageIDToAdd = [];
             var MessageDateTimeToAdd = [];
-            // var MessageCurrentStateToAdd = [];
 
             MessageNameToAdd.push(myMessageName);
             MessageToAdd.push(myMessage);
             MessageIDToAdd.push(myMessageID);
             MessageDateTimeToAdd.push(myMessageDateTime);
-            // MessageCurrentStateToAdd.push(myMessageCurrentState);
 
             window.sessionStorage.setItem("OwnMessageName", JSON.stringify(MessageNameToAdd))
             window.sessionStorage.setItem("OwnMessage", JSON.stringify(MessageToAdd))
             window.sessionStorage.setItem("OwnMessageID", JSON.stringify(MessageIDToAdd))
             window.sessionStorage.setItem("OwnMessageDateTime", JSON.stringify(MessageDateTimeToAdd))
-            // window.sessionStorage.setItem("OwnMessageCurrentState", JSON.stringify(MessageCurrentStateToAdd))
         }
         else{
             //If sessionStorage is not empty, add the already stored message data in sessionStorage and the new message into the array
@@ -296,26 +285,22 @@
             var MessageToAdd = [];
             var MessageIDToAdd = [];
             var MessageDateTimeToAdd = [];
-            // var MessageCurrentStateToAdd = [];
 
             for(i = 0; i < myMessageNameStored.length; i++){
                 MessageNameToAdd.push(myMessageNameStored[i]);
                 MessageToAdd.push(myMessageStored[i]);
                 MessageIDToAdd.push(myMessageIDStored[i]);
                 MessageDateTimeToAdd.push(myMessageDateTimeStored[i]);
-                // MessageCurrentStateToAdd.push(myMessageCurrentStateStored[i]);
             }
             MessageNameToAdd.push(myMessageName);
             MessageToAdd.push(myMessage);
             MessageIDToAdd.push(myMessageID);
             MessageDateTimeToAdd.push(myMessageDateTime);
-            // MessageCurrentStateToAdd.push(myMessageCurrentState);
 
             window.sessionStorage.setItem("OwnMessageName", JSON.stringify(MessageNameToAdd))
             window.sessionStorage.setItem("OwnMessage", JSON.stringify(MessageToAdd))
             window.sessionStorage.setItem("OwnMessageID", JSON.stringify(MessageIDToAdd))
             window.sessionStorage.setItem("OwnMessageDateTime", JSON.stringify(MessageDateTimeToAdd))
-            // window.sessionStorage.setItem("OwnMessageCurrentState", JSON.stringify(MessageCurrentStateToAdd))
         }
 
         //Here gets the full stored sessionStorage message data
@@ -323,7 +308,6 @@
         myMessageStored = JSON.parse(sessionStorage.getItem("OwnMessage"));
         myMessageIDStored = JSON.parse(sessionStorage.getItem("OwnMessageID"));
         myMessageDateTimeStored = JSON.parse(sessionStorage.getItem("OwnMessageDateTime"));
-        // myMessageCurrentStateStored = JSON.parse(sessionStorage.getItem("OwnMessageCurrentState"));
 
 
         //***This is for replies to specific student's browser***
@@ -380,9 +364,6 @@
                 
                 }
             }
-
-        
-            
     })
 
     //Socket io gets the back end data to front-end
